@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+  id="fraud-action-v1"
+  name="FraudAction"
+  namespace="https://primebank.com/dmn/fraud">
+
+  <!-- INPUTS -->
+
+  <inputData id="VelocityRiskScore" name="VelocityRiskScore">
+    <variable name="VelocityRiskScore" typeRef="number"/>
+  </inputData>
+
+  <inputData id="AuthRiskScore" name="AuthRiskScore">
+    <variable name="AuthRiskScore" typeRef="number"/>
+  </inputData>
+
+  <inputData id="MerchantRiskScore" name="MerchantRiskScore">
+    <variable name="MerchantRiskScore" typeRef="number"/>
+  </inputData>
+
+  <inputData id="TerminalRiskScore" name="TerminalRiskScore">
+    <variable name="TerminalRiskScore" typeRef="number"/>
+  </inputData>
+
+  <inputData id="txn_channel" name="txn_channel">
+    <variable name="txn_channel" typeRef="string"/>
+  </inputData>
+
+  <!-- DECISION -->
+  <decision id="FraudDecisionDecision" name="FraudDecision">
+        <variable name="FraudDecision" typeRef="string"/>
+
+        <!-- required inputs -->
+        <informationRequirement><requiredInput href="#VelocityRiskScore"/></informationRequirement>
+        <informationRequirement><requiredInput href="#AuthRiskScore"/></informationRequirement>
+        <informationRequirement><requiredInput href="#MerchantRiskScore"/></informationRequirement>
+        <informationRequirement><requiredInput href="#TerminalRiskScore"/></informationRequirement>
+        <informationRequirement><requiredInput href="#txn_channel"/></informationRequirement>
+
+        <decisionTable hitPolicy="FIRST">
+
+            <!-- Input #1: AuthRiskScore -->
+            <input>
+                <inputExpression typeRef="number">
+                <text>AuthRiskScore</text>
+                </inputExpression>
+            </input>
+
+            <!-- Input #2: VelocityRiskScore -->
+            <input>
+                <inputExpression typeRef="number">
+                <text>VelocityRiskScore</text>
+                </inputExpression>
+            </input>
+
+            <!-- Input #3: MerchantRiskScore -->
+            <input>
+                <inputExpression typeRef="number">
+                <text>MerchantRiskScore</text>
+                </inputExpression>
+            </input>
+
+            <!-- Input #4: TerminalRiskScore -->
+            <input>
+                <inputExpression typeRef="number">
+                <text>TerminalRiskScore</text>
+                </inputExpression>
+            </input>
+
+            <!-- Input #5: txn_channel -->
+            <input>
+                <inputExpression typeRef="string">
+                <text>txn_channel</text>
+                </inputExpression>
+            </input>
+
+            <!-- Single output (unnamed) -->
+            <output/>
+
+            <!-- RULE #1: HARD FRAUD (aligns to wrong pin/cvv + extreme velocity) -->
+            <rule>
+                <!-- AuthRiskScore -->
+                <inputEntry><text>&gt;= 20</text></inputEntry>
+                <!-- VelocityRiskScore -->
+                <inputEntry><text>&gt;= 40</text></inputEntry>
+                <!-- MerchantRiskScore -->
+                <inputEntry><text>-</text></inputEntry>
+                <!-- TerminalRiskScore -->
+                <inputEntry><text>-</text></inputEntry>
+                <!-- txn_channel -->
+                <inputEntry><text>-</text></inputEntry>
+
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+            </rule>
+
+            <!-- RULE #2: SUSPICIOUS (aligns to high velocity OR risky MCC groups) -->
+            <rule>
+                <!-- AuthRiskScore -->
+                <inputEntry><text>-</text></inputEntry>
+                <!-- VelocityRiskScore -->
+                <inputEntry><text>&gt;= 30</text></inputEntry>
+                <!-- MerchantRiskScore -->
+                <inputEntry><text>&gt;= 50</text></inputEntry>
+                <!-- TerminalRiskScore -->
+                <inputEntry><text>-</text></inputEntry>
+                <!-- txn_channel -->
+                <inputEntry><text>-</text></inputEntry>
+
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+            </rule>
+
+            <!-- RULE: HIGH RISK MERCHANT -->
+            <rule>
+                <inputEntry><text>-</text></inputEntry>           <!-- Auth -->
+                <inputEntry><text>-</text></inputEntry>           <!-- Velocity -->
+                <inputEntry><text>&gt;= 90</text></inputEntry>   <!-- Merchant -->
+                <inputEntry><text>-</text></inputEntry>           <!-- Terminal -->
+                <inputEntry><text>-</text></inputEntry>           <!-- Channel -->
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>&gt;= 70</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+            </rule>
+
+
+            <!-- RULE: EXTREME VELOCITY -->
+            <rule>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>&gt;= 40</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>&gt;= 30</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+            </rule>
+
+
+
+            <!-- DEFAULT -->
+            <rule>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <outputEntry><text>"NORMAL"</text></outputEntry>
+            </rule>
+
+        </decisionTable>
+
+
+  </decision>
+
+</definitions>

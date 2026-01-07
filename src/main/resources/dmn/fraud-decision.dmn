@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+    xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+    xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+    xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+    xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/"
+    id="fraud-decision"
+    name="FraudDecision"
+    namespace="https://primebank.com/dmn/fraud">
+
+    <!-- ================= INPUTS ================= -->
+
+    <inputData id="TotalRiskScore" name="TotalRiskScore">
+        <variable name="TotalRiskScore" typeRef="number"/>
+    </inputData>
+
+    <inputData id="FRAUD_THRESHOLD" name="FRAUD_THRESHOLD">
+        <variable name="FRAUD_THRESHOLD" typeRef="number"/>
+    </inputData>
+
+    <inputData id="RISKY_THRESHOLD" name="RISKY_THRESHOLD">
+        <variable name="RISKY_THRESHOLD" typeRef="number"/>
+    </inputData>
+
+    <inputData id="SUSPICIOUS_THRESHOLD" name="SUSPICIOUS_THRESHOLD">
+        <variable name="SUSPICIOUS_THRESHOLD" typeRef="number"/>
+    </inputData>
+
+    <!-- ================= DECISION ================= -->
+
+    <decision id="FraudCategoryDecision" name="FraudCategory">
+
+        <!-- REQUIRED by Kogito -->
+        <variable name="FraudCategory" typeRef="string"/>
+
+        <informationRequirement>
+            <requiredInput href="#TotalRiskScore"/>
+        </informationRequirement>
+
+        <informationRequirement>
+            <requiredInput href="#FRAUD_THRESHOLD"/>
+        </informationRequirement>
+
+        <informationRequirement>
+            <requiredInput href="#RISKY_THRESHOLD"/>
+        </informationRequirement>
+
+        <informationRequirement>
+            <requiredInput href="#SUSPICIOUS_THRESHOLD"/>
+        </informationRequirement>
+
+        <decisionTable hitPolicy="FIRST">
+
+            <input>
+                <inputExpression typeRef="number">
+                    <text>TotalRiskScore</text>
+                </inputExpression>
+            </input>
+
+            <!-- single unnamed output -->
+            <output/>
+
+            <!-- RULE ORDER = PRIORITY -->
+
+            <rule>
+                <inputEntry>
+                    <text>&gt;= FRAUD_THRESHOLD</text>
+                </inputEntry>
+                <outputEntry>
+                    <text>"FRAUD"</text>
+                </outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry>
+                    <text>&gt;= RISKY_THRESHOLD</text>
+                </inputEntry>
+                <outputEntry>
+                    <text>"RISKY"</text>
+                </outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry>
+                    <text>&gt;= SUSPICIOUS_THRESHOLD</text>
+                </inputEntry>
+                <outputEntry>
+                    <text>"SUSPICIOUS"</text>
+                </outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry>
+                    <text>-</text>
+                </inputEntry>
+                <outputEntry>
+                    <text>"NORMAL"</text>
+                </outputEntry>
+            </rule>
+
+        </decisionTable>
+    </decision>
+
+</definitions>

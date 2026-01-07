@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+  xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/"
+  xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/"
+  xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/"
+  id="risk-score-v1"
+  name="RiskScore"
+  namespace="https://primebank.com/dmn/fraud">
+
+  <!-- ================= INPUTS (coming from DMN #1 or from your service layer) ================= -->
+
+  <inputData id="VelocityRiskScore" name="VelocityRiskScore">
+    <variable id="v_VelocityRiskScore" name="VelocityRiskScore" typeRef="number"/>
+  </inputData>
+
+  <inputData id="DeviceRiskScore" name="DeviceRiskScore">
+    <variable id="v_DeviceRiskScore" name="DeviceRiskScore" typeRef="number"/>
+  </inputData>
+
+  <inputData id="BeneficiaryRiskScore" name="BeneficiaryRiskScore">
+    <variable id="v_BeneficiaryRiskScore" name="BeneficiaryRiskScore" typeRef="number"/>
+  </inputData>
+
+  <inputData id="AuthRiskScore" name="AuthRiskScore">
+    <variable id="v_AuthRiskScore" name="AuthRiskScore" typeRef="number"/>
+  </inputData>
+
+  <inputData id="MlFraudScore" name="MlFraudScore">
+    <variable id="v_MlFraudScore" name="MlFraudScore" typeRef="number"/>
+  </inputData>
+
+  <!-- ================= DECISION ================= -->
+  
+  <decision id="TotalRiskScoreDecision" name="TotalRiskScore">
+    <variable id="v_TotalRiskScore" name="TotalRiskScore" typeRef="number"/>
+
+    <informationRequirement>
+        <requiredInput href="#VelocityRiskScore"/>
+    </informationRequirement>
+    <informationRequirement>
+        <requiredInput href="#DeviceRiskScore"/>
+    </informationRequirement>
+    <informationRequirement>
+        <requiredInput href="#BeneficiaryRiskScore"/>
+    </informationRequirement>
+    <informationRequirement>
+        <requiredInput href="#AuthRiskScore"/>
+    </informationRequirement>
+    <informationRequirement>
+        <requiredInput href="#MlFraudScore"/>
+    </informationRequirement>
+
+    <literalExpression>
+        <text>
+        VelocityRiskScore * 0.25 +
+        DeviceRiskScore * 0.20 +
+        BeneficiaryRiskScore * 0.20 +
+        AuthRiskScore * 0.15 +
+        MlFraudScore * 20
+        </text>
+    </literalExpression>
+  </decision>
+
+
+    
+
+
+</definitions>

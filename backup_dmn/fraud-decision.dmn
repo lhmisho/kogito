@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+    xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+    id="fraud-decision"
+    name="FraudDecision"
+    namespace="https://primebank.com/dmn/fraud">
+
+    <!-- INPUT: TotalRiskScore comes from RiskScore DMN (or orchestrator) -->
+    <inputData id="TotalRiskScore" name="TotalRiskScore">
+        <variable name="TotalRiskScore" typeRef="number"/>
+    </inputData>
+
+    <decision id="FraudCategoryDecision" name="FraudCategory">
+        <variable name="FraudCategory" typeRef="string"/>
+
+        <informationRequirement>
+            <requiredInput href="#TotalRiskScore"/>
+        </informationRequirement>
+
+        <decisionTable hitPolicy="FIRST">
+            <input>
+                <inputExpression typeRef="number">
+                    <text>TotalRiskScore</text>
+                </inputExpression>
+            </input>
+
+            <output/>
+
+            <rule>
+                <inputEntry><text>&gt;= 80</text></inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>&gt;= 50</text></inputEntry>
+                <outputEntry><text>"RISKY"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>&gt;= 30</text></inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>-</text></inputEntry>
+                <outputEntry><text>"NORMAL"</text></outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+
+</definitions>
