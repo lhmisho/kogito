@@ -1,0 +1,165 @@
+<?xml version="1.0" ?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:feel="https://www.omg.org/spec/DMN/20191111/FEEL/" id="card-fraud-decision" name="CardFraudDecision" expressionLanguage="https://www.omg.org/spec/DMN/20191111/FEEL/" typeLanguage="https://www.omg.org/spec/DMN/20191111/FEEL/" namespace="https://primebank.com/dmn/card">
+  <inputData id="inp_txn_channel" name="txn_channel">
+    <variable name="txn_channel" typeRef="string"></variable>
+  </inputData>
+  <inputData id="inp_txn_count_5" name="txn_count_5">
+    <variable name="txn_count_5" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_txn_amount_5" name="txn_amount_5">
+    <variable name="txn_amount_5" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_txn_count_30" name="txn_count_30">
+    <variable name="txn_count_30" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_txn_amount_30" name="txn_amount_30">
+    <variable name="txn_amount_30" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_wrong_cvv_10" name="wrong_cvv_10">
+    <variable name="wrong_cvv_10" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_wrong_pin_10" name="wrong_pin_10">
+    <variable name="wrong_pin_10" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_card_failed_cnt1day" name="card_failed_cnt1day">
+    <variable name="card_failed_cnt1day" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_ccy_cnt1hr" name="ccy_cnt1hr">
+    <variable name="ccy_cnt1hr" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_card_terminal_txn_cnt1day" name="card_terminal_txn_cnt1day">
+    <variable name="card_terminal_txn_cnt1day" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_card_terminal_txn_failed_cnt1day" name="card_terminal_txn_failed_cnt1day">
+    <variable name="card_terminal_txn_failed_cnt1day" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_ml_fraud_score_card" name="ml_fraud_score_card">
+    <variable name="ml_fraud_score_card" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_is_magstripe" name="is_magstripe">
+    <variable name="is_magstripe" typeRef="boolean"></variable>
+  </inputData>
+  <inputData id="inp_is_3ds_authenticated" name="is_3ds_authenticated">
+    <variable name="is_3ds_authenticated" typeRef="boolean"></variable>
+  </inputData>
+  <inputData id="inp_mcc_group_id" name="mcc_group_id">
+    <variable name="mcc_group_id" typeRef="string"></variable>
+  </inputData>
+  <inputData id="inp_product_code" name="product_code">
+    <variable name="product_code" typeRef="string"></variable>
+  </inputData>
+  <inputData id="inp_suspicious_mcc_list" name="SUSPICIOUS_MCC_LIST">
+    <variable name="SUSPICIOUS_MCC_LIST" typeRef="Any"></variable>
+  </inputData>
+  <inputData id="inp_product_mcc_risk" name="PRODUCT_MCC_RISK">
+    <variable name="PRODUCT_MCC_RISK" typeRef="string"></variable>
+  </inputData>
+  <inputData id="inp_country_risk" name="COUNTRY_RISK">
+    <variable name="COUNTRY_RISK" typeRef="string"></variable>
+  </inputData>
+  <inputData id="inp_velocity_5_count" name="VELOCITY_5_COUNT">
+    <variable name="VELOCITY_5_COUNT" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_velocity_5_amount" name="VELOCITY_5_AMOUNT">
+    <variable name="VELOCITY_5_AMOUNT" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_velocity_30_count" name="VELOCITY_30_COUNT">
+    <variable name="VELOCITY_30_COUNT" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_velocity_30_amount" name="VELOCITY_30_AMOUNT">
+    <variable name="VELOCITY_30_AMOUNT" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_failed_txn_1day" name="FAILED_TXN_1DAY">
+    <variable name="FAILED_TXN_1DAY" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_ml_fraud_threshold" name="ML_FRAUD_THRESHOLD">
+    <variable name="ML_FRAUD_THRESHOLD" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_processing_code" name="processing_code">
+    <variable name="processing_code" typeRef="string"></variable>
+  </inputData>
+  <inputData id="inp_merchant_name" name="merchant_name">
+    <variable name="merchant_name" typeRef="string"></variable>
+  </inputData>
+  <decision name="CardFraudDecision">
+    <variable name="CardFraudDecision" typeRef="Any"></variable>
+    <informationRequirement>
+      <requiredInput href="#inp_country_risk"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_product_mcc_risk"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_ml_fraud_score_card"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_ml_fraud_threshold"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_is_magstripe"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_txn_channel"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_wrong_cvv_10"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_wrong_pin_10"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_txn_count_5"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_txn_amount_5"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_txn_count_30"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_txn_amount_30"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_velocity_5_count"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_velocity_5_amount"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_is_3ds_authenticated"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_ccy_cnt1hr"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_suspicious_mcc_list"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_mcc_group_id"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_velocity_30_count"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_velocity_30_amount"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_card_failed_cnt1day"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_failed_txn_1day"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_card_terminal_txn_cnt1day"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_card_terminal_txn_failed_cnt1day"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_processing_code"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_merchant_name"></requiredInput>
+    </informationRequirement>
+  </decision>
+</definitions>

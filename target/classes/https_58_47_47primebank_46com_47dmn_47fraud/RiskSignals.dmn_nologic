@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" id="risk-signals" name="RiskSignals" expressionLanguage="https://www.omg.org/spec/DMN/20191111/FEEL/" typeLanguage="https://www.omg.org/spec/DMN/20191111/FEEL/" namespace="https://primebank.com/dmn/fraud">
+  <inputData id="txnCount5" name="transaction_count_last_5_min">
+    <variable name="transaction_count_last_5_min" typeRef="number"></variable>
+  </inputData>
+  <inputData id="txnAmount5" name="amount_sum_last_5_min">
+    <variable name="amount_sum_last_5_min" typeRef="number"></variable>
+  </inputData>
+  <inputData id="txnCount30" name="transaction_count_last_30_min">
+    <variable name="transaction_count_last_30_min" typeRef="number"></variable>
+  </inputData>
+  <inputData id="txnAmount30" name="amount_sum_last_30_min">
+    <variable name="amount_sum_last_30_min" typeRef="number"></variable>
+  </inputData>
+  <decision id="VelocityRiskScore" name="VelocityRiskScore">
+    <variable name="VelocityRiskScore" typeRef="number"></variable>
+    <informationRequirement>
+      <requiredInput href="#txnCount5"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#txnAmount5"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#txnCount30"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#txnAmount30"></requiredInput>
+    </informationRequirement>
+  </decision>
+</definitions>

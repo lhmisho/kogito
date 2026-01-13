@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" id="fraud-action-v1" name="FraudAction" expressionLanguage="https://www.omg.org/spec/DMN/20191111/FEEL/" typeLanguage="https://www.omg.org/spec/DMN/20191111/FEEL/" namespace="https://primebank.com/dmn/fraud">
+  <inputData id="VelocityRiskScore" name="VelocityRiskScore">
+    <variable name="VelocityRiskScore" typeRef="number"></variable>
+  </inputData>
+  <inputData id="AuthRiskScore" name="AuthRiskScore">
+    <variable name="AuthRiskScore" typeRef="number"></variable>
+  </inputData>
+  <inputData id="MerchantRiskScore" name="MerchantRiskScore">
+    <variable name="MerchantRiskScore" typeRef="number"></variable>
+  </inputData>
+  <inputData id="TerminalRiskScore" name="TerminalRiskScore">
+    <variable name="TerminalRiskScore" typeRef="number"></variable>
+  </inputData>
+  <inputData id="txn_channel" name="txn_channel">
+    <variable name="txn_channel" typeRef="string"></variable>
+  </inputData>
+  <decision id="FraudDecisionDecision" name="FraudDecision">
+    <variable name="FraudDecision" typeRef="string"></variable>
+    <informationRequirement>
+      <requiredInput href="#VelocityRiskScore"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#AuthRiskScore"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#MerchantRiskScore"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#TerminalRiskScore"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#txn_channel"></requiredInput>
+    </informationRequirement>
+  </decision>
+</definitions>

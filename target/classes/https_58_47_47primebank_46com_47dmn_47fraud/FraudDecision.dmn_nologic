@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" id="fraud-decision" name="FraudDecision" expressionLanguage="https://www.omg.org/spec/DMN/20191111/FEEL/" typeLanguage="https://www.omg.org/spec/DMN/20191111/FEEL/" namespace="https://primebank.com/dmn/fraud">
+  <inputData id="TotalRiskScore" name="TotalRiskScore">
+    <variable name="TotalRiskScore" typeRef="number"></variable>
+  </inputData>
+  <inputData id="FRAUD_THRESHOLD" name="FRAUD_THRESHOLD">
+    <variable name="FRAUD_THRESHOLD" typeRef="number"></variable>
+  </inputData>
+  <inputData id="RISKY_THRESHOLD" name="RISKY_THRESHOLD">
+    <variable name="RISKY_THRESHOLD" typeRef="number"></variable>
+  </inputData>
+  <inputData id="SUSPICIOUS_THRESHOLD" name="SUSPICIOUS_THRESHOLD">
+    <variable name="SUSPICIOUS_THRESHOLD" typeRef="number"></variable>
+  </inputData>
+  <decision id="FraudCategoryDecision" name="FraudCategory">
+    <variable name="FraudCategory" typeRef="string"></variable>
+    <informationRequirement>
+      <requiredInput href="#TotalRiskScore"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#FRAUD_THRESHOLD"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#RISKY_THRESHOLD"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#SUSPICIOUS_THRESHOLD"></requiredInput>
+    </informationRequirement>
+  </decision>
+</definitions>

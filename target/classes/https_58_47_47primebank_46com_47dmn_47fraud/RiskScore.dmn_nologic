@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" id="risk-score-v1" name="RiskScore" expressionLanguage="https://www.omg.org/spec/DMN/20191111/FEEL/" typeLanguage="https://www.omg.org/spec/DMN/20191111/FEEL/" namespace="https://primebank.com/dmn/fraud">
+  <inputData id="VelocityRiskScore" name="VelocityRiskScore">
+    <variable id="v_VelocityRiskScore" name="VelocityRiskScore" typeRef="number"></variable>
+  </inputData>
+  <inputData id="DeviceRiskScore" name="DeviceRiskScore">
+    <variable id="v_DeviceRiskScore" name="DeviceRiskScore" typeRef="number"></variable>
+  </inputData>
+  <inputData id="BeneficiaryRiskScore" name="BeneficiaryRiskScore">
+    <variable id="v_BeneficiaryRiskScore" name="BeneficiaryRiskScore" typeRef="number"></variable>
+  </inputData>
+  <inputData id="AuthRiskScore" name="AuthRiskScore">
+    <variable id="v_AuthRiskScore" name="AuthRiskScore" typeRef="number"></variable>
+  </inputData>
+  <inputData id="MlFraudScore" name="MlFraudScore">
+    <variable id="v_MlFraudScore" name="MlFraudScore" typeRef="number"></variable>
+  </inputData>
+  <decision id="TotalRiskScoreDecision" name="TotalRiskScore">
+    <variable id="v_TotalRiskScore" name="TotalRiskScore" typeRef="number"></variable>
+    <informationRequirement>
+      <requiredInput href="#VelocityRiskScore"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#DeviceRiskScore"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#BeneficiaryRiskScore"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#AuthRiskScore"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#MlFraudScore"></requiredInput>
+    </informationRequirement>
+  </decision>
+</definitions>

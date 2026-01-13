@@ -1,0 +1,16 @@
+com/primebank/fraud/MyPrimeRuleConfigService.class
+com/primebank/fraud/FraudThresholdService.class
+com/primebank/fraud/CardFraudThresholdServiceImpl.class
+com/primebank/fraud/CardFraudThresholdService.class
+com/primebank/fraud/MyPrimeRuleConfigServiceImpl.class
+com/primebank/fraud/CardMccProductRuleService.class
+com/primebank/fraud/ThresholdValue.class
+com/primebank/fraud/CardFraudOrchestratorResource.class
+com/primebank/fraud/CountryBlockRuleService.class
+com/primebank/GreetingResource.class
+com/primebank/fraud/DebugResource.class
+com/primebank/fraud/CountryBlockRuleServiceImpl.class
+com/primebank/fraud/CardMccRuleService.class
+com/primebank/fraud/CardMccRuleServiceImpl.class
+com/primebank/fraud/MyPrimeFraudOrchestratorResource.class
+com/primebank/fraud/CardMccProductRuleServiceImpl.class
