@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+    xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+    xmlns:feel="https://www.omg.org/spec/DMN/20191111/FEEL/"
+    id="card-fraud-decision"
+    name="CardFraudDecision"
+    namespace="https://primebank.com/dmn/card">
+
+    <!-- =========================================================
+         INPUTS – TRANSACTION
+         ========================================================= -->
+
+    <!-- =========================
+     INPUTS – TRANSACTION
+     ========================= -->
+
+    <inputData id="inp_txn_channel" name="txn_channel">
+        <variable name="txn_channel" typeRef="string"/>
+    </inputData>
+
+    <inputData id="inp_txn_count_5" name="txn_count_5">
+        <variable name="txn_count_5" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_txn_amount_5" name="txn_amount_5">
+        <variable name="txn_amount_5" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_txn_count_30" name="txn_count_30">
+        <variable name="txn_count_30" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_txn_amount_30" name="txn_amount_30">
+        <variable name="txn_amount_30" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_wrong_cvv_10" name="wrong_cvv_10">
+        <variable name="wrong_cvv_10" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_wrong_pin_10" name="wrong_pin_10">
+        <variable name="wrong_pin_10" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_card_failed_cnt1day" name="card_failed_cnt1day">
+        <variable name="card_failed_cnt1day" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_ccy_cnt1hr" name="ccy_cnt1hr">
+        <variable name="ccy_cnt1hr" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_card_terminal_txn_cnt1day" name="card_terminal_txn_cnt1day">
+        <variable name="card_terminal_txn_cnt1day" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_card_terminal_txn_failed_cnt1day" name="card_terminal_txn_failed_cnt1day">
+        <variable name="card_terminal_txn_failed_cnt1day" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_ml_fraud_score_card" name="ml_fraud_score_card">
+        <variable name="ml_fraud_score_card" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_is_magstripe" name="is_magstripe">
+        <variable name="is_magstripe" typeRef="boolean"/>
+    </inputData>
+
+    <inputData id="inp_is_3ds_authenticated" name="is_3ds_authenticated">
+        <variable name="is_3ds_authenticated" typeRef="boolean"/>
+    </inputData>
+
+    <inputData id="inp_mcc_group_id" name="mcc_group_id">
+        <variable name="mcc_group_id" typeRef="string"/>
+    </inputData>
+
+    <inputData id="inp_product_code" name="product_code">
+        <variable name="product_code" typeRef="string"/>
+    </inputData>
+
+    <!-- =========================
+        INPUTS – JAVA / DB ENRICHED
+        ========================= -->
+
+    <inputData id="inp_suspicious_mcc_list" name="SUSPICIOUS_MCC_LIST">
+        <variable name="SUSPICIOUS_MCC_LIST" typeRef="Any"/>
+    </inputData>
+
+    <!-- FROM JAVA -->
+    <inputData id="inp_product_mcc_risk" name="PRODUCT_MCC_RISK">
+        <variable name="PRODUCT_MCC_RISK" typeRef="string"/>
+    </inputData>
+
+    <inputData id="inp_country_risk" name="COUNTRY_RISK">
+        <variable name="COUNTRY_RISK" typeRef="string"/>
+    </inputData>
+
+    <inputData id="inp_velocity_5_count" name="VELOCITY_5_COUNT">
+        <variable name="VELOCITY_5_COUNT" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_velocity_5_amount" name="VELOCITY_5_AMOUNT">
+        <variable name="VELOCITY_5_AMOUNT" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_velocity_30_count" name="VELOCITY_30_COUNT">
+        <variable name="VELOCITY_30_COUNT" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_velocity_30_amount" name="VELOCITY_30_AMOUNT">
+        <variable name="VELOCITY_30_AMOUNT" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_failed_txn_1day" name="FAILED_TXN_1DAY">
+        <variable name="FAILED_TXN_1DAY" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_ml_fraud_threshold" name="ML_FRAUD_THRESHOLD">
+        <variable name="ML_FRAUD_THRESHOLD" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_processing_code" name="processing_code">
+        <variable name="processing_code" typeRef="string"/>
+    </inputData>
+    <inputData id="inp_merchant_name" name="merchant_name">
+        <variable name="merchant_name" typeRef="string"/>
+    </inputData>
+
+
+
+
+
+    <!-- =========================================================
+         DECISION
+         ========================================================= -->
+
+    <decision name="CardFraudDecision">
+        <variable name="CardFraudDecision" typeRef="Any"/>
+
+        <informationRequirement><requiredInput href="#inp_country_risk"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_product_mcc_risk"/></informationRequirement>
+
+        <informationRequirement><requiredInput href="#inp_ml_fraud_score_card"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_ml_fraud_threshold"/></informationRequirement>
+
+        <informationRequirement><requiredInput href="#inp_is_magstripe"/></informationRequirement>
+
+        <informationRequirement><requiredInput href="#inp_txn_channel"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_wrong_cvv_10"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_wrong_pin_10"/></informationRequirement>
+
+        <informationRequirement><requiredInput href="#inp_txn_count_5"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_txn_amount_5"/></informationRequirement>
+
+        <informationRequirement><requiredInput href="#inp_txn_count_30"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_txn_amount_30"/></informationRequirement>
+
+        <informationRequirement><requiredInput href="#inp_velocity_5_count"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_velocity_5_amount"/></informationRequirement>
+
+        <informationRequirement><requiredInput href="#inp_is_3ds_authenticated"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_ccy_cnt1hr"/></informationRequirement>
+
+        <informationRequirement><requiredInput href="#inp_suspicious_mcc_list"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_mcc_group_id"/></informationRequirement>
+
+        <!-- missing rules -->
+        <informationRequirement><requiredInput href="#inp_velocity_30_count"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_velocity_30_amount"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_card_failed_cnt1day"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_failed_txn_1day"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_card_terminal_txn_cnt1day"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_card_terminal_txn_failed_cnt1day"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_processing_code"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_merchant_name"/></informationRequirement>
+
+        <decisionTable hitPolicy="PRIORITY">
+
+            <input>
+                <inputExpression typeRef="boolean">
+                    <text>true</text>
+                </inputExpression>
+            </input>
+
+            <!-- OUTPUTS (MANDATORY FOR PRIORITY) -->
+            <output name="fraud_decision" typeRef="string">
+                <outputValues>
+                    <text>"FRAUD","SUSPICIOUS","NORMAL"</text>
+                </outputValues>
+            </output>
+
+            <output name="fraud_reason" typeRef="string">
+                <outputValues>
+                    <text>
+                        "COUNTRY_BLOCKED",
+                        "COUNTRY_HIGH_RISK",
+                        "ML_FRAUD_SCORE_HIGH",
+                        "MAGSTRIPE_BLOCK",
+                        "WRONG_CVV",
+                        "WRONG_PIN",
+                        "VELOCITY_5MIN",
+                        "VELOCITY_30MIN",
+                        "PRODUCT_MCC_RESTRICT",
+                        "NON_3DS_TRANSACTION",
+                        "MULTI_CCY",
+                        "MCC_FLAGGED",
+                        "CARD_FAILED_ATTEMPTS_1DAY",  <!-- Added for the card failed attempts rule -->
+                        "TERMINAL_FAILURE_RATIO_HIGH",  <!-- Added for terminal failure ratio rule -->
+                        "RISKY_PROCESSING_CODE",  <!-- Added for processing code rule -->
+                        "MERCHANT_NAME_PATTERN",  <!-- Added for merchant name pattern rule -->
+                        "NONE"
+                    </text>
+                </outputValues>
+            </output>
+
+            <!-- =========================
+                 FRAUD (HIGHEST)
+                 ========================= -->
+
+            <rule>
+                <inputEntry><text>COUNTRY_RISK = "FRAUD"</text></inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"COUNTRY_BLOCKED"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry>
+                    <text>
+                        ml_fraud_score_card != null and
+                        ML_FRAUD_THRESHOLD != null and
+                        ml_fraud_score_card >= ML_FRAUD_THRESHOLD
+                    </text>
+                </inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"ML_FRAUD_SCORE_HIGH"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>is_magstripe = true</text></inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"MAGSTRIPE_BLOCK"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>txn_channel="ECOM" and wrong_cvv_10 >= 2</text></inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"WRONG_CVV"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>txn_channel="ECOM" and wrong_pin_10 >= 2</text></inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"WRONG_PIN"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry>
+                    <text>
+                        (txn_count_5 > VELOCITY_5_COUNT) or
+                        (txn_amount_5 >= VELOCITY_5_AMOUNT)
+                    </text>
+                </inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"VELOCITY_5MIN"</text></outputEntry>
+            </rule>
+
+            <!-- =========================
+                 SUSPICIOUS
+                 ========================= -->
+
+            <rule>
+                <inputEntry><text>COUNTRY_RISK = "SUSPICIOUS"</text></inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+                <outputEntry><text>"COUNTRY_HIGH_RISK"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>PRODUCT_MCC_RISK = "SUSPICIOUS"</text></inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+                <outputEntry><text>"PRODUCT_MCC_RESTRICT"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>is_3ds_authenticated = false</text></inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+                <outputEntry><text>"NON_3DS_TRANSACTION"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>ccy_cnt1hr > 1</text></inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+                <outputEntry><text>"MULTI_CCY"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry>
+                    <text>
+                        SUSPICIOUS_MCC_LIST != null and
+                        mcc_group_id in SUSPICIOUS_MCC_LIST
+                    </text>
+                </inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+                <outputEntry><text>"MCC_FLAGGED"</text></outputEntry>
+            </rule>
+
+            <!-- =========================
+                 DEFAULT
+                 ========================= -->
+
+            <rule>
+                <inputEntry><text>true</text></inputEntry>
+                <outputEntry><text>"NORMAL"</text></outputEntry>
+                <outputEntry><text>"NONE"</text></outputEntry>
+            </rule>
+
+            <!-- =========================
+                 Missing rules
+                 ========================= -->
+            <rule>
+                <inputEntry>
+                    <text>
+                        (txn_count_30 > VELOCITY_30_COUNT) or
+                        (txn_amount_30 >= VELOCITY_30_AMOUNT)
+                    </text>
+                </inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"VELOCITY_30MIN"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry>
+                    <text>
+                        card_failed_cnt1day > FAILED_TXN_1DAY
+                    </text>
+                </inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"CARD_FAILED_ATTEMPTS_1DAY"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry>
+                    <text>
+                        card_terminal_txn_cnt1day > 0 and
+                        (card_terminal_txn_failed_cnt1day / card_terminal_txn_cnt1day) >= 0.5
+                    </text>
+                </inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"TERMINAL_FAILURE_RATIO_HIGH"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry>
+                    <text>
+                        processing_code in ("482000","601000","799500")
+                    </text>
+                </inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+                <outputEntry><text>"RISKY_PROCESSING_CODE"</text></outputEntry>
+            </rule>
+            <rule>
+    <inputEntry>
+        <text>
+            merchant_name != null and (
+                contains(upper case(merchant_name), "CASINO") or
+                contains(upper case(merchant_name), "GAMING") or
+                contains(upper case(merchant_name), "CRYPTO") or
+                contains(upper case(merchant_name), "MLM")
+            )
+        </text>
+    </inputEntry>
+    <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+    <outputEntry><text>"MERCHANT_NAME_PATTERN"</text></outputEntry>
+</rule>
+
+
+
+
+        </decisionTable>
+    </decision>
+</definitions>
