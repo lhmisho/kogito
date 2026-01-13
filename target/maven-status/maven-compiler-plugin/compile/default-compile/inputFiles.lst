@@ -10,6 +10,7 @@
 /Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/CountryBlockRuleServiceImpl.java
 /Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/CountryRuleService.java
 /Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/DebugResource.java
+/Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/FraudAdminResource.java
 /Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/FraudThresholdService.java
 /Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/MyPrimeFraudOrchestratorResource.java
 /Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/MyPrimeRuleConfigService.java

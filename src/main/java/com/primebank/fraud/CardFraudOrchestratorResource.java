@@ -7,12 +7,12 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-@Path("/fraud/card/decision")
+@Path("/CardFraudDecision")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @ApplicationScoped
@@ -27,140 +27,139 @@ public class CardFraudOrchestratorResource {
     @Inject
     CardFraudThresholdService thresholdService;
 
-    @Inject
-    CardMccRuleService mccRuleService;
-
-    @Inject
-    CountryBlockRuleService countryBlockRuleService;
-
     @POST
-    public Map<String, Object> decide(Map<String, Object> txn) {
-
-        // 1) Load thresholds from DB/cache
-        thresholdService.loadActiveThresholds();
-
-        // 2) Prepare DMN input context
-        Map<String, Object> dmnInput = new HashMap<>();
-
-        // -----------------------------
-        // A) Normalize key identifiers
-        // -----------------------------
-        String txnId = asString(txn.get("txn_id"));
-        String productCode = asString(txn.get("product_code"));
-        String mcc = asString(txn.get("mcc_group_id"));
-        String txnCountry = asString(txn.get("txn_country"));
-
-        // Keep these as explicit inputs (DMN expects them)
-        dmnInput.put("product_code", productCode);
-        dmnInput.put("mcc_group_id", mcc);
-        dmnInput.put("txn_country", txnCountry);
-
-        // -----------------------------
-        // B) Scalar flags / channels
-        // -----------------------------
-        dmnInput.put("txn_channel", asString(txn.get("txn_channel")));
-
-        dmnInput.put("is_magstripe", asBoolean(txn.get("is_magstripe"), false));
-        dmnInput.put("is_3ds_authenticated", asBoolean(txn.get("is_3ds_authenticated"), true));
-
-        // -----------------------------
-        // C) Raw numeric counters (safe defaults)
-        // -----------------------------
-        dmnInput.put("txn_count_5", asNumber(txn.get("txn_count_5"), 0));
-        dmnInput.put("txn_amount_5", asNumber(txn.get("txn_amount_5"), 0));
-        dmnInput.put("txn_count_30", asNumber(txn.get("txn_count_30"), 0));
-        dmnInput.put("txn_amount_30", asNumber(txn.get("txn_amount_30"), 0));
-
-        dmnInput.put("wrong_cvv_10", asNumber(txn.get("wrong_cvv_10"), 0));
-        dmnInput.put("wrong_pin_10", asNumber(txn.get("wrong_pin_10"), 0));
-
-        dmnInput.put("card_failed_cnt1day", asNumber(txn.get("card_failed_cnt1day"), 0));
-        dmnInput.put("ccy_cnt1hr", asNumber(txn.get("ccy_cnt1hr"), 0));
-
-        dmnInput.put("card_terminal_txn_cnt1day", asNumber(txn.get("card_terminal_txn_cnt1day"), 0));
-        dmnInput.put("card_terminal_txn_failed_cnt1day", asNumber(txn.get("card_terminal_txn_failed_cnt1day"), 0));
-
-        dmnInput.put("ml_fraud_score_card", asNumber(txn.get("ml_fraud_score_card"), 0));
-
-        // -----------------------------
-        // D) DB-driven thresholds (must match DMN input names)
-        // -----------------------------
-        dmnInput.put("VELOCITY_5_COUNT", thresholdService.get("VELOCITY_5_COUNT"));
-        dmnInput.put("VELOCITY_5_AMOUNT", thresholdService.get("VELOCITY_5_AMOUNT"));
-        dmnInput.put("VELOCITY_30_COUNT", thresholdService.get("VELOCITY_30_COUNT"));
-        dmnInput.put("VELOCITY_30_AMOUNT", thresholdService.get("VELOCITY_30_AMOUNT"));
-        dmnInput.put("FAILED_TXN_1DAY", thresholdService.get("FAILED_TXN_1DAY"));
-        dmnInput.put("ML_FRAUD_THRESHOLD", thresholdService.get("ML_FRAUD_THRESHOLD"));
-
-        // -----------------------------
-        // E) DB-driven lists
-        // -----------------------------
-        List<String> suspiciousMccList = mccRuleService.getSuspiciousMccList();
-        dmnInput.put("SUSPICIOUS_MCC_LIST", suspiciousMccList);
-
-        // -----------------------------
-        // F) COUNTRY BLOCK (JAVA decides, DMN consumes scalar)
-        // -----------------------------
-        String countryDecision = countryBlockRuleService.getCountryDecision(txnCountry);
-        dmnInput.put("COUNTRY_RISK", countryDecision);
-
-        // -----------------------------
-        // G) PRODUCT + MCC (JAVA decides, DMN consumes scalar)
-        // -----------------------------
-        String productMccRisk = null;
-        if (productCode != null && !productCode.isBlank() && mcc != null && !mcc.isBlank()) {
-            Map<String, String> productMccRiskMap = mccRuleService.getProductMccRiskMap(productCode);
-            if (productMccRiskMap != null) {
-                productMccRisk = productMccRiskMap.get(mcc);
-            }
+    public Response decide(Map<String, Object> txn) {
+        try {
+            // Build DMN input context
+            Map<String, Object> dmnInput = buildDmnInput(txn);
+            
+            // Execute DMN
+            Map<String, Object> dmnResult = evaluateDmn(dmnInput);
+            
+            // Build response
+            Map<String, Object> response = buildResponse(txn, dmnResult);
+            
+            return Response.ok(response).build();
+            
+        } catch (Exception e) {
+            // Return error response
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Fraud decision failed");
+            errorResponse.put("message", e.getMessage());
+            errorResponse.put("timestamp", Instant.now().toString());
+            
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(errorResponse)
+                    .build();
         }
-        dmnInput.put("PRODUCT_MCC_RISK", productMccRisk);
+    }
 
-        // -----------------------------
-        // 3) Execute DMN
-        // -----------------------------
-        Map<String, Object> result = evaluate(DMN_MODEL_NAME, dmnInput);
+    private Map<String, Object> buildDmnInput(Map<String, Object> txn) {
+        Map<String, Object> input = new HashMap<>();
 
+        // 1. Basic transaction data
+        copyTransactionData(txn, input);
+        
+        // 2. Get all thresholds at once
+        if (thresholdService instanceof CardFraudThresholdServiceImpl) {
+            CardFraudThresholdServiceImpl service = (CardFraudThresholdServiceImpl) thresholdService;
+            
+            // Add all thresholds
+            service.getAllThresholds().forEach(input::put);
+            
+            // Add MCC list
+            input.put("SUSPICIOUS_MCC_LIST", service.getSuspiciousMccList());
+            
+            // Add country risk
+            String countryCode = asString(txn.get("txn_country"));
+            input.put("COUNTRY_RISK", service.getCountryRisk(countryCode));
+            
+            // Add product MCC risk
+            String productCode = asString(txn.get("product_code"));
+            String mccCode = asString(txn.get("mcc_group_id"));
+            input.put("PRODUCT_MCC_RISK", service.getProductMccRisk(productCode, mccCode));
+        } else {
+            // Fallback to individual calls
+            addIndividualThresholds(input);
+        }
+        
+        return input;
+    }
+
+    private void copyTransactionData(Map<String, Object> source, Map<String, Object> target) {
+        // Map all expected DMN inputs
+        target.put("txn_channel", asString(source.get("txn_channel")));
+        target.put("product_code", asString(source.get("product_code")));
+        target.put("mcc_group_id", asString(source.get("mcc_group_id")));
+        
+        target.put("is_magstripe", asBoolean(source.get("is_magstripe"), false));
+        target.put("is_3ds_authenticated", asBoolean(source.get("is_3ds_authenticated"), true));
+        
+        target.put("txn_count_5", asNumber(source.get("txn_count_5"), 0));
+        target.put("txn_amount_5", asNumber(source.get("txn_amount_5"), 0));
+        target.put("txn_count_30", asNumber(source.get("txn_count_30"), 0));
+        target.put("txn_amount_30", asNumber(source.get("txn_amount_30"), 0));
+        
+        target.put("wrong_cvv_10", asNumber(source.get("wrong_cvv_10"), 0));
+        target.put("wrong_pin_10", asNumber(source.get("wrong_pin_10"), 0));
+        
+        target.put("card_failed_cnt1day", asNumber(source.get("card_failed_cnt1day"), 0));
+        target.put("ccy_cnt1hr", asNumber(source.get("ccy_cnt1hr"), 0));
+        
+        target.put("card_terminal_txn_cnt1day", asNumber(source.get("card_terminal_txn_cnt1day"), 0));
+        target.put("card_terminal_txn_failed_cnt1day", asNumber(source.get("card_terminal_txn_failed_cnt1day"), 0));
+        
+        target.put("ml_fraud_score_card", asNumber(source.get("ml_fraud_score_card"), 0));
+        
+        // Additional fields for new rules
+        target.put("processing_code", asString(source.get("processing_code")));
+        target.put("merchant_name", asString(source.get("merchant_name")));
+        target.put("txn_amount", asNumber(source.get("txn_amount"), 0));
+    }
+
+    private void addIndividualThresholds(Map<String, Object> input) {
+        input.put("VELOCITY_5_COUNT", thresholdService.get("VELOCITY_5_COUNT"));
+        input.put("VELOCITY_5_AMOUNT", thresholdService.get("VELOCITY_5_AMOUNT"));
+        input.put("VELOCITY_30_COUNT", thresholdService.get("VELOCITY_30_COUNT"));
+        input.put("VELOCITY_30_AMOUNT", thresholdService.get("VELOCITY_30_AMOUNT"));
+        input.put("FAILED_TXN_1DAY", thresholdService.get("FAILED_TXN_1DAY"));
+        input.put("ML_FRAUD_THRESHOLD", thresholdService.get("ML_FRAUD_THRESHOLD"));
+    }
+
+    private Map<String, Object> evaluateDmn(Map<String, Object> input) {
+        DecisionModel model = decisionModels.getDecisionModel(DMN_NAMESPACE, DMN_MODEL_NAME);
+        
+        if (model == null) {
+            throw new IllegalStateException("DMN model not found: " + DMN_MODEL_NAME);
+        }
+        
+        return model.evaluateAll(model.newContext(input)).getContext().getAll();
+    }
+
+    private Map<String, Object> buildResponse(Map<String, Object> txn, Map<String, Object> dmnResult) {
         @SuppressWarnings("unchecked")
-        Map<String, Object> decision = (Map<String, Object>) result.get(DMN_MODEL_NAME);
-
+        Map<String, Object> decision = (Map<String, Object>) dmnResult.get(DMN_MODEL_NAME);
+        
         if (decision == null) {
-            // Provide context for faster debugging (no sensitive data)
-            throw new WebApplicationException(
-                    "DMN returned no decision result. Check DMN model name/namespace and required inputs. " +
-                    "model=" + DMN_MODEL_NAME + ", namespace=" + DMN_NAMESPACE,
-                    500
-            );
+            throw new IllegalStateException("DMN returned no decision");
         }
-
-        // -----------------------------
-        // 4) Response
-        // -----------------------------
+        
         Map<String, Object> response = new HashMap<>();
-        response.put("transactionId", txnId);
+        response.put("transaction_id", txn.get("txn_id"));
         response.put("fraud_decision", decision.get("fraud_decision"));
         response.put("fraud_reason", decision.get("fraud_reason"));
-        response.put("evaluatedAt", Instant.now().toString());
-
+        response.put("evaluated_at", Instant.now().toString());
+        response.put("model_version", "1.0");
+        
+        // Include the full DMN result if needed for debugging
+        if (Boolean.TRUE.equals(txn.get("debug"))) {
+            response.put("dmn_context", dmnResult);
+        }
+        
         return response;
     }
 
-    private Map<String, Object> evaluate(String modelName, Map<String, Object> input) {
-        DecisionModel model = decisionModels.getDecisionModel(DMN_NAMESPACE, modelName);
-
-        if (model == null) {
-            throw new WebApplicationException("DMN not found: " + modelName + " (namespace=" + DMN_NAMESPACE + ")", 500);
-        }
-
-        return model.evaluateAll(model.newContext(input))
-                .getContext()
-                .getAll();
-    }
-
-    /* =========================
-       Helpers: safe conversions
-       ========================= */
-
+    // Helper methods
     private static String asString(Object v) {
         if (v == null) return null;
         String s = String.valueOf(v).trim();
@@ -175,10 +174,6 @@ public class CardFraudOrchestratorResource {
         return s.equals("true") || s.equals("1") || s.equals("yes") || s.equals("y");
     }
 
-    /**
-     * DMN typeRef="number" accepts Java Number types well.
-     * We normalize to Double (safe and predictable).
-     */
     private static Double asNumber(Object v, double defaultVal) {
         if (v == null) return defaultVal;
         if (v instanceof Number) return ((Number) v).doubleValue();

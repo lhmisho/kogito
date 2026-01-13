@@ -304,16 +304,6 @@
             </rule>
 
             <!-- =========================
-                 DEFAULT
-                 ========================= -->
-
-            <rule>
-                <inputEntry><text>true</text></inputEntry>
-                <outputEntry><text>"NORMAL"</text></outputEntry>
-                <outputEntry><text>"NONE"</text></outputEntry>
-            </rule>
-
-            <!-- =========================
                  Missing rules
                  ========================= -->
             <rule>
@@ -358,22 +348,29 @@
                 <outputEntry><text>"RISKY_PROCESSING_CODE"</text></outputEntry>
             </rule>
             <rule>
-    <inputEntry>
-        <text>
-            merchant_name != null and (
-                contains(upper case(merchant_name), "CASINO") or
-                contains(upper case(merchant_name), "GAMING") or
-                contains(upper case(merchant_name), "CRYPTO") or
-                contains(upper case(merchant_name), "MLM")
-            )
-        </text>
-    </inputEntry>
-    <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
-    <outputEntry><text>"MERCHANT_NAME_PATTERN"</text></outputEntry>
-</rule>
+                <inputEntry>
+                    <text>
+                        merchant_name != null and (
+                            contains(upper case(merchant_name), "CASINO") or
+                            contains(upper case(merchant_name), "GAMING") or
+                            contains(upper case(merchant_name), "CRYPTO") or
+                            contains(upper case(merchant_name), "MLM")
+                        )
+                    </text>
+                </inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+                <outputEntry><text>"MERCHANT_NAME_PATTERN"</text></outputEntry>
+            </rule>
 
+            <!-- =========================
+                 DEFAULT
+                 ========================= -->
 
-
+            <rule>
+                <inputEntry><text>true</text></inputEntry>
+                <outputEntry><text>"NORMAL"</text></outputEntry>
+                <outputEntry><text>"NONE"</text></outputEntry>
+            </rule>
 
         </decisionTable>
     </decision>
