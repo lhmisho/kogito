@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:feel="https://www.omg.org/spec/DMN/20191111/FEEL/" id="myprime-simple-decision" name="MyPrimeSimpleDecision" expressionLanguage="https://www.omg.org/spec/DMN/20191111/FEEL/" typeLanguage="https://www.omg.org/spec/DMN/20191111/FEEL/" namespace="https://primebank.com/dmn/myprime">
+  <inputData id="inp_transaction_amount" name="transaction_amount">
+    <variable name="transaction_amount" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_is_new_device" name="is_new_device">
+    <variable name="is_new_device" typeRef="boolean"></variable>
+  </inputData>
+  <inputData id="inp_is_new_beneficiary" name="is_new_beneficiary">
+    <variable name="is_new_beneficiary" typeRef="boolean"></variable>
+  </inputData>
+  <inputData id="inp_failed_logins_last_1hr" name="failed_logins_last_1hr">
+    <variable name="failed_logins_last_1hr" typeRef="number"></variable>
+  </inputData>
+  <inputData id="inp_xgboost_ml_score" name="xgboost_ml_score">
+    <variable name="xgboost_ml_score" typeRef="number"></variable>
+  </inputData>
+  <decision id="d1" name="MyPrimeSimpleDecision">
+    <variable name="decisionResult" typeRef="Any"></variable>
+    <informationRequirement>
+      <requiredInput href="#inp_transaction_amount"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_is_new_device"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_is_new_beneficiary"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_failed_logins_last_1hr"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_xgboost_ml_score"></requiredInput>
+    </informationRequirement>
+  </decision>
+</definitions>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+    xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+    id="myprime-final-decision"
+    name="MyPrimeFinalDecision"
+    namespace="https://primebank.com/dmn/myprime/final">
+
+    <!-- ================= INPUTS ================= -->
+
+    <inputData id="inp_max_ml_score" name="max_ml_score">
+        <variable name="max_ml_score" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_total_risk_score" name="total_risk_score">
+        <variable name="total_risk_score" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_RULES" name="RULES">
+        <variable name="RULES" typeRef="Any"/>
+    </inputData>
+
+    <!-- ================= FINAL DECISION ================= -->
+
+    <decision id="FinalDecision" name="FinalDecision">
+        <variable name="FinalDecision" typeRef="string"/>
+
+        <informationRequirement>
+            <requiredInput href="#inp_max_ml_score"/>
+        </informationRequirement>
+        <informationRequirement>
+            <requiredInput href="#inp_total_risk_score"/>
+        </informationRequirement>
+        <informationRequirement>
+            <requiredInput href="#inp_RULES"/>
+        </informationRequirement>
+
+        <decisionTable hitPolicy="PRIORITY">
+
+            <input>
+                <inputExpression typeRef="number">
+                    <text>max_ml_score</text>
+                </inputExpression>
+            </input>
+
+            <input>
+                <inputExpression typeRef="number">
+                    <text>total_risk_score</text>
+                </inputExpression>
+            </input>
+
+            <output>
+                <outputValues>
+                    <text>"FRAUD","SUSPICIOUS","NORMAL"</text>
+                </outputValues>
+            </output>
+
+            <!-- ML FRAUD -->
+            <rule>
+                <inputEntry><text>&gt;= RULES.GLOBAL.ml_fraud</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+            </rule>
+
+            <!-- ML SUSPICIOUS -->
+            <rule>
+                <inputEntry><text>&gt;= RULES.GLOBAL.ml_susp</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+            </rule>
+
+            <!-- RULE FRAUD -->
+            <rule>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>&gt;= RULES.GLOBAL.fraud_score</text></inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+            </rule>
+
+            <!-- RULE SUSPICIOUS -->
+            <rule>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>&gt;= RULES.GLOBAL.susp_score</text></inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+            </rule>
+
+            <!-- DEFAULT -->
+            <rule>
+                <inputEntry><text>-</text></inputEntry>
+                <inputEntry><text>-</text></inputEntry>
+                <outputEntry><text>"NORMAL"</text></outputEntry>
+            </rule>
+
+        </decisionTable>
+    </decision>
+
+    <!-- ================= DECISION REASON ================= -->
+
+    <decision id="DecisionReason" name="DecisionReason">
+        <variable name="DecisionReason" typeRef="string"/>
+
+        <informationRequirement>
+            <requiredDecision href="#FinalDecision"/>
+        </informationRequirement>
+        <informationRequirement>
+            <requiredInput href="#inp_max_ml_score"/>
+        </informationRequirement>
+        <informationRequirement>
+            <requiredInput href="#inp_RULES"/>
+        </informationRequirement>
+
+        <literalExpression>
+            <text>
+                if FinalDecision = "FRAUD" and max_ml_score &gt;= RULES.GLOBAL.ml_fraud
+                then "ML_THRESHOLD_BREACH"
+                else if FinalDecision = "SUSPICIOUS" and max_ml_score &gt;= RULES.GLOBAL.ml_susp
+                then "ML_SUSPICIOUS_ZONE"
+                else if FinalDecision = "FRAUD"
+                then "RULE_THRESHOLD_BREACH"
+                else if FinalDecision = "SUSPICIOUS"
+                then "RULE_SUSPICIOUS_ZONE"
+                else "LOW_RISK"
+            </text>
+        </literalExpression>
+    </decision>
+
+</definitions>

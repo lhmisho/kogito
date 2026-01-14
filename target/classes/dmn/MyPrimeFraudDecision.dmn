@@ -1,125 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions
+<definitions 
     xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
-    id="myprime-final-decision"
-    name="MyPrimeFinalDecision"
-    namespace="https://primebank.com/dmn/myprime/final">
+    xmlns:feel="https://www.omg.org/spec/DMN/20191111/FEEL/"
+    id="myprime-simple-decision"
+    name="MyPrimeSimpleDecision"
+    namespace="https://primebank.com/dmn/myprime">
 
-    <!-- ================= INPUTS ================= -->
-
-    <inputData id="inp_max_ml_score" name="max_ml_score">
-        <variable name="max_ml_score" typeRef="number"/>
+    <!-- Simple Inputs -->
+    <inputData id="inp_transaction_amount" name="transaction_amount">
+        <variable name="transaction_amount" typeRef="number"/>
     </inputData>
 
-    <inputData id="inp_total_risk_score" name="total_risk_score">
-        <variable name="total_risk_score" typeRef="number"/>
+    <inputData id="inp_is_new_device" name="is_new_device">
+        <variable name="is_new_device" typeRef="boolean"/>
     </inputData>
 
-    <inputData id="inp_RULES" name="RULES">
-        <variable name="RULES" typeRef="Any"/>
+    <inputData id="inp_is_new_beneficiary" name="is_new_beneficiary">
+        <variable name="is_new_beneficiary" typeRef="boolean"/>
     </inputData>
 
-    <!-- ================= FINAL DECISION ================= -->
+    <inputData id="inp_failed_logins_last_1hr" name="failed_logins_last_1hr">
+        <variable name="failed_logins_last_1hr" typeRef="number"/>
+    </inputData>
 
-    <decision id="FinalDecision" name="FinalDecision">
-        <variable name="FinalDecision" typeRef="string"/>
+    <inputData id="inp_xgboost_ml_score" name="xgboost_ml_score">
+        <variable name="xgboost_ml_score" typeRef="number"/>
+    </inputData>
 
+    <!-- Simple Decision Table -->
+    <decision name="MyPrimeSimpleDecision" id="d1">
+        <variable name="decisionResult" typeRef="Any"/>
+        
         <informationRequirement>
-            <requiredInput href="#inp_max_ml_score"/>
+            <requiredInput href="#inp_transaction_amount"/>
         </informationRequirement>
         <informationRequirement>
-            <requiredInput href="#inp_total_risk_score"/>
+            <requiredInput href="#inp_is_new_device"/>
         </informationRequirement>
         <informationRequirement>
-            <requiredInput href="#inp_RULES"/>
+            <requiredInput href="#inp_is_new_beneficiary"/>
         </informationRequirement>
-
-        <decisionTable hitPolicy="PRIORITY">
-
+        <informationRequirement>
+            <requiredInput href="#inp_failed_logins_last_1hr"/>
+        </informationRequirement>
+        <informationRequirement>
+            <requiredInput href="#inp_xgboost_ml_score"/>
+        </informationRequirement>
+        
+        <decisionTable hitPolicy="UNIQUE">
             <input>
-                <inputExpression typeRef="number">
-                    <text>max_ml_score</text>
+                <inputExpression typeRef="string">
+                    <text>"input"</text>
                 </inputExpression>
             </input>
-
-            <input>
-                <inputExpression typeRef="number">
-                    <text>total_risk_score</text>
-                </inputExpression>
-            </input>
-
-            <output>
+            
+            <output name="fraud_decision" typeRef="string">
                 <outputValues>
                     <text>"FRAUD","SUSPICIOUS","NORMAL"</text>
                 </outputValues>
             </output>
-
-            <!-- ML FRAUD -->
+            
+            <output name="fraud_reason" typeRef="string"/>
+            
+            <!-- RULE 1: High ML Score -->
             <rule>
-                <inputEntry><text>&gt;= RULES.GLOBAL.ml_fraud</text></inputEntry>
-                <inputEntry><text>-</text></inputEntry>
+                <inputEntry>
+                    <text>xgboost_ml_score &gt;= 0.7</text>
+                </inputEntry>
                 <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"HIGH_ML_SCORE"</text></outputEntry>
             </rule>
-
-            <!-- ML SUSPICIOUS -->
+            
+            <!-- RULE 2: New Device + New Beneficiary -->
             <rule>
-                <inputEntry><text>&gt;= RULES.GLOBAL.ml_susp</text></inputEntry>
-                <inputEntry><text>-</text></inputEntry>
-                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
-            </rule>
-
-            <!-- RULE FRAUD -->
-            <rule>
-                <inputEntry><text>-</text></inputEntry>
-                <inputEntry><text>&gt;= RULES.GLOBAL.fraud_score</text></inputEntry>
+                <inputEntry>
+                    <text>is_new_device = true and is_new_beneficiary = true</text>
+                </inputEntry>
                 <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"NEW_DEVICE_AND_BENEFICIARY"</text></outputEntry>
             </rule>
-
-            <!-- RULE SUSPICIOUS -->
+            
+            <!-- RULE 3: Multiple Failed Logins -->
             <rule>
-                <inputEntry><text>-</text></inputEntry>
-                <inputEntry><text>&gt;= RULES.GLOBAL.susp_score</text></inputEntry>
+                <inputEntry>
+                    <text>failed_logins_last_1hr &gt;= 3</text>
+                </inputEntry>
                 <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+                <outputEntry><text>"MULTIPLE_FAILED_LOGINS"</text></outputEntry>
             </rule>
-
-            <!-- DEFAULT -->
+            
+            <!-- RULE 4: Large Amount -->
             <rule>
-                <inputEntry><text>-</text></inputEntry>
-                <inputEntry><text>-</text></inputEntry>
+                <inputEntry>
+                    <text>transaction_amount &gt; 100000</text>
+                </inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+                <outputEntry><text>"LARGE_AMOUNT"</text></outputEntry>
+            </rule>
+            
+            <!-- RULE 5: Default Normal -->
+            <rule>
+                <inputEntry>
+                    <text>true</text>
+                </inputEntry>
                 <outputEntry><text>"NORMAL"</text></outputEntry>
+                <outputEntry><text>"NONE"</text></outputEntry>
             </rule>
-
         </decisionTable>
     </decision>
-
-    <!-- ================= DECISION REASON ================= -->
-
-    <decision id="DecisionReason" name="DecisionReason">
-        <variable name="DecisionReason" typeRef="string"/>
-
-        <informationRequirement>
-            <requiredDecision href="#FinalDecision"/>
-        </informationRequirement>
-        <informationRequirement>
-            <requiredInput href="#inp_max_ml_score"/>
-        </informationRequirement>
-        <informationRequirement>
-            <requiredInput href="#inp_RULES"/>
-        </informationRequirement>
-
-        <literalExpression>
-            <text>
-                if FinalDecision = "FRAUD" and max_ml_score &gt;= RULES.GLOBAL.ml_fraud
-                then "ML_THRESHOLD_BREACH"
-                else if FinalDecision = "SUSPICIOUS" and max_ml_score &gt;= RULES.GLOBAL.ml_susp
-                then "ML_SUSPICIOUS_ZONE"
-                else if FinalDecision = "FRAUD"
-                then "RULE_THRESHOLD_BREACH"
-                else if FinalDecision = "SUSPICIOUS"
-                then "RULE_SUSPICIOUS_ZONE"
-                else "LOW_RISK"
-            </text>
-        </literalExpression>
-    </decision>
-
 </definitions>

@@ -13,6 +13,9 @@
 /Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/FraudAdminResource.java
 /Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/FraudThresholdService.java
 /Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/MyPrimeFraudOrchestratorResource.java
+/Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/MyPrimeFraudThresholdService.java
+/Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/MyPrimeFraudThresholdServiceImpl.java
 /Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/MyPrimeRuleConfigService.java
 /Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/MyPrimeRuleConfigServiceImpl.java
+/Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/MyPrimeSimpleTestResource.java
 /Users/lokmanhossen/dev/kogito/fraud-decision-service/src/main/java/com/primebank/fraud/ThresholdValue.java
