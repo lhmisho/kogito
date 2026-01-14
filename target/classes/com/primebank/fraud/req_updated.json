@@ -1,5 +1,3 @@
-req_updated.json
-
 {
     "txn_id": "TEST_001",
     "txn_timestamp": "2026-01-13T14:30:00",
@@ -30,49 +28,50 @@ req_updated.json
     "merchant_name": "Test Merchant"
 }
 
-Test 1: COUNTRY BLOCKED (FRAUD)
+TEST 1: MCC_6011_HIGH_FREQ_1HR.
 curl -X POST http: //localhost:8080/CardFraudDecision \
 -H "Content-Type: application/json" \
 -d '{
-    "txn_id": "TEST_COUNTRY_FRAUD",
-    "txn_channel": "ECOM",
-    "txn_country": "AW",
-    "product_code": "CREDIT_CARD",
-    "mcc_group_id": "5411",
+    "txn_id": "TXN-6011-001",
+    "product_code": "DEBIT_CARD",
+    "txn_channel": "ATM",
+    "mcc_group_id": "6011",
+    "mcc_6011_txn_count_1hr": 4,
     "txn_count_5": 1,
-    "txn_amount_5": 100,
+    "txn_amount_5": 20000,
+    "txn_count_30": 2,
+    "txn_amount_30": 40000,
+    "ml_fraud_score_card": 0.12,
+    "is_magstripe": false,
+    "is_3ds_authenticated": true
+}'
+{
+    "transaction_id": "TXN-6011-001",
+    "model_version": "1.0",
+    "fraud_reason": "MCC_6011_HIGH_FREQ_1HR",
+    "fraud_decision": "SUSPICIOUS",
+    "evaluated_at": "2026-01-14T08:06:22.342617Z"
+}%
+
+Test 2: PRODUCT MCC RESTRICT (SUSPICIOUS)
+curl -X POST http: //localhost:8080/CardFraudDecision \
+-H "Content-Type: application/json" \
+-d '{
+    "txn_id": "TEST_PRODUCT_MCC",
+    "txn_channel": "ECOM",
+    "txn_country": "BD",
+    "product_code": "CREDIT_CARD",
+    "mcc_group_id": "7273",
     "is_3ds_authenticated": true,
     "ml_fraud_score_card": 0.1
 }'
 {
-    "transaction_id": "TEST_COUNTRY_FRAUD",
+    "transaction_id": "TEST_PRODUCT_MCC",
     "model_version": "1.0",
-    "fraud_reason": "COUNTRY_BLOCKED",
-    "fraud_decision": "FRAUD",
-    "evaluated_at": "2026-01-13T14:12:30.266016Z"
+    "fraud_reason": "PRODUCT_MCC_RESTRICT",
+    "fraud_decision": "SUSPICIOUS",
+    "evaluated_at": "2026-01-13T14:26:08.095995Z"
 }%
-
-Test 2: ML FRAUD SCORE HIGH (FRAUD)
-(base) ➜  ~ curl -X POST http: //localhost:8080/CardFraudDecision \
--H "Content-Type: application/json" \
--d '{
-    "txn_id": "TEST_ML_FRAUD",
-    "txn_channel": "ECOM",
-    "txn_country": "BD",
-    "product_code": "CREDIT_CARD",
-    "mcc_group_id": "5411",
-    "ml_fraud_score_card": 0.95,
-    "ML_FRAUD_THRESHOLD": 0.9,
-    "is_3ds_authenticated": true
-}'
-{
-    "transaction_id": "TEST_ML_FRAUD",
-    "model_version": "1.0",
-    "fraud_reason": "ML_FRAUD_SCORE_HIGH",
-    "fraud_decision": "FRAUD",
-    "evaluated_at": "2026-01-13T14:13:38.907243Z"
-}%                                                                                                                                                              (base) ➜  ~
-
 
 Test 3: MAGSTRIPE BLOCK (FRAUD)
 (base) ➜  ~ curl -X POST http: //localhost:8080/CardFraudDecision \
@@ -93,7 +92,94 @@ Test 3: MAGSTRIPE BLOCK (FRAUD)
     "fraud_reason": "MAGSTRIPE_BLOCK",
     "fraud_decision": "FRAUD",
     "evaluated_at": "2026-01-13T14:14:27.072511Z"
-}%(base) ➜  ~
+}%
+
+Test 4: COUNTRY BLOCKED (FRAUD)
+curl -X POST http: //localhost:8080/CardFraudDecision \
+-H "Content-Type: application/json" \
+-d '{
+    "txn_id": "TEST_COUNTRY_FRAUD",
+    "txn_channel": "ECOM",
+    "txn_country": "Israil",
+    "product_code": "CREDIT_CARD",
+    "mcc_group_id": "5411",
+    "txn_count_5": 1,
+    "txn_amount_5": 100,
+    "is_3ds_authenticated": true,
+    "ml_fraud_score_card": 0.1
+}'
+{
+    "transaction_id": "TEST_COUNTRY_FRAUD",
+    "model_version": "1.0",
+    "fraud_reason": "COUNTRY_BLOCKED",
+    "fraud_decision": "FRAUD",
+    "evaluated_at": "2026-01-13T14:12:30.266016Z"
+}%
+
+Test 5: MERCHANT NAME PATTERN (SUSPICIOUS)
+curl -X POST http: //localhost:8080/CardFraudDecision \
+-H "Content-Type: application/json" \
+-d '{
+    "txn_id": "TEST_MERCHANT_PATTERN",
+    "txn_channel": "ECOM",
+    "txn_country": "BD",
+    "product_code": "CREDIT_CARD",
+    "mcc_group_id": "5411",
+    "merchant_name": "BITCOIN CRYPTO EXCHANGE",
+    "is_3ds_authenticated": true,
+    "ml_fraud_score_card": 0.1
+}'
+
+{
+    "transaction_id": "TEST_MERCHANT_PATTERN",
+    "model_version": "1.0",
+    "fraud_reason": "MERCHANT_NAME_PATTERN",
+    "fraud_decision": "SUSPICIOUS",
+    "evaluated_at": "2026-01-13T14:32:23.365345Z"
+}%
+
+
+Test 6: NON 3DS TRANSACTION (SUSPICIOUS)
+curl -X POST http: //localhost:8080/CardFraudDecision \
+-H "Content-Type: application/json" \
+-d '{
+    "txn_id": "TEST_NON_3DS",
+    "txn_channel": "ECOM",
+    "txn_country": "BD",
+    "product_code": "CREDIT_CARD",
+    "mcc_group_id": "5411",
+    "is_3ds_authenticated": false,
+    "ml_fraud_score_card": 0.1
+}'
+{
+    "transaction_id": "TEST_NON_3DS",
+    "model_version": "1.0",
+    "fraud_reason": "NON_3DS_TRANSACTION",
+    "fraud_decision": "SUSPICIOUS",
+    "evaluated_at": "2026-01-13T14:27:18.788224Z"
+}%
+
+
+Test 2: ML FRAUD SCORE HIGH (FRAUD)
+(base) ➜  ~ curl -X POST http: //localhost:8080/CardFraudDecision \
+-H "Content-Type: application/json" \
+-d '{
+    "txn_id": "TEST_ML_FRAUD",
+    "txn_channel": "ECOM",
+    "txn_country": "BD",
+    "product_code": "CREDIT_CARD",
+    "mcc_group_id": "5411",
+    "ml_fraud_score_card": 0.95,
+    "ML_FRAUD_THRESHOLD": 0.9,
+    "is_3ds_authenticated": true
+}'
+{
+    "transaction_id": "TEST_ML_FRAUD",
+    "model_version": "1.0",
+    "fraud_reason": "ML_FRAUD_SCORE_HIGH",
+    "fraud_decision": "FRAUD",
+    "evaluated_at": "2026-01-13T14:13:38.907243Z"
+}% 
 
 
 Test 4: WRONG CVV (FRAUD)
@@ -299,45 +385,9 @@ curl -X POST http: //localhost:8080/CardFraudDecision \
 }%
 
 
-Test 13: PRODUCT MCC RESTRICT (SUSPICIOUS)
-curl -X POST http: //localhost:8080/CardFraudDecision \
--H "Content-Type: application/json" \
--d '{
-    "txn_id": "TEST_PRODUCT_MCC",
-    "txn_channel": "ECOM",
-    "txn_country": "BD",
-    "product_code": "CREDIT_CARD",
-    "mcc_group_id": "7273",
-    "is_3ds_authenticated": true,
-    "ml_fraud_score_card": 0.1
-}'
-{
-    "transaction_id": "TEST_PRODUCT_MCC",
-    "model_version": "1.0",
-    "fraud_reason": "PRODUCT_MCC_RESTRICT",
-    "fraud_decision": "SUSPICIOUS",
-    "evaluated_at": "2026-01-13T14:26:08.095995Z"
-}%
 
-Test 14: NON 3DS TRANSACTION (SUSPICIOUS)
-curl -X POST http: //localhost:8080/CardFraudDecision \
--H "Content-Type: application/json" \
--d '{
-    "txn_id": "TEST_NON_3DS",
-    "txn_channel": "ECOM",
-    "txn_country": "BD",
-    "product_code": "CREDIT_CARD",
-    "mcc_group_id": "5411",
-    "is_3ds_authenticated": false,
-    "ml_fraud_score_card": 0.1
-}'
-{
-    "transaction_id": "TEST_NON_3DS",
-    "model_version": "1.0",
-    "fraud_reason": "NON_3DS_TRANSACTION",
-    "fraud_decision": "SUSPICIOUS",
-    "evaluated_at": "2026-01-13T14:27:18.788224Z"
-}%
+
+
 
 Test 15: MULTI CURRENCY (SUSPICIOUS)
 curl -X POST http: //localhost:8080/CardFraudDecision \
@@ -403,27 +453,7 @@ curl -X POST http: //localhost:8080/CardFraudDecision \
     "evaluated_at": "2026-01-13T14:29:03.743992Z"
 }%
 
-Test 18: MERCHANT NAME PATTERN (SUSPICIOUS)
-curl -X POST http: //localhost:8080/CardFraudDecision \
--H "Content-Type: application/json" \
--d '{
-    "txn_id": "TEST_MERCHANT_PATTERN",
-    "txn_channel": "ECOM",
-    "txn_country": "BD",
-    "product_code": "CREDIT_CARD",
-    "mcc_group_id": "5411",
-    "merchant_name": "BITCOIN CRYPTO EXCHANGE",
-    "is_3ds_authenticated": true,
-    "ml_fraud_score_card": 0.1
-}'
 
-{
-    "transaction_id": "TEST_MERCHANT_PATTERN",
-    "model_version": "1.0",
-    "fraud_reason": "MERCHANT_NAME_PATTERN",
-    "fraud_decision": "SUSPICIOUS",
-    "evaluated_at": "2026-01-13T14:32:23.365345Z"
-}%
 
 Test 19: NORMAL TRANSACTION
 curl -X POST http: //localhost:8080/CardFraudDecision \

@@ -1,0 +1,42 @@
+(base) ➜  ~ curl -X POST http://localhost:8080/MyPrimeFinalDecision \
+  -H "Content-Type: application/json" \
+  -d '{
+    "max_ml_score": 0.12,
+    "total_risk_score": 10,
+    "RULES": {
+      "GLOBAL": {
+        "ml_fraud": 0.90,
+        "ml_susp": 0.60
+      }
+    }
+  }'
+
+{"max_ml_score":0.12,"FinalDecision":"NORMAL","total_risk_score":10,"RULES":{"GLOBAL":{"ml_fraud":0.9,"ml_susp":0.6}}}%
+(base) ➜  ~ curl -X POST http://localhost:8080/MyPrimeFinalDecision \
+  -H "Content-Type: application/json" \
+  -d '{
+    "max_ml_score": 0.65,
+    "total_risk_score": 10,
+    "RULES": {
+      "GLOBAL": {
+        "ml_fraud": 0.90,
+        "ml_susp": 0.60
+      }
+    }
+  }'
+
+{"max_ml_score":0.65,"FinalDecision":"SUSPICIOUS","total_risk_score":10,"RULES":{"GLOBAL":{"ml_fraud":0.9,"ml_susp":0.6}}}%
+(base) ➜  ~ curl -X POST http://localhost:8080/MyPrimeFinalDecision \
+  -H "Content-Type: application/json" \
+  -d '{
+    "max_ml_score": 0.95,
+    "total_risk_score": 10,
+    "RULES": {
+      "GLOBAL": {
+        "ml_fraud": 0.90,
+        "ml_susp": 0.60
+      }
+    }
+  }'
+
+{"max_ml_score":0.95,"FinalDecision":"FRAUD","total_risk_score":10,"RULES":{"GLOBAL":{"ml_fraud":0.9,"ml_susp":0.6}}}%                                           (base) ➜  ~

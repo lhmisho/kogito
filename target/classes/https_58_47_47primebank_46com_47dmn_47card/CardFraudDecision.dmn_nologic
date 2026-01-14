@@ -81,6 +81,9 @@
   <inputData id="inp_merchant_name" name="merchant_name">
     <variable name="merchant_name" typeRef="string"></variable>
   </inputData>
+  <inputData id="inp_mcc_6011_txn_count_1hr" name="mcc_6011_txn_count_1hr">
+    <variable name="mcc_6011_txn_count_1hr" typeRef="number"></variable>
+  </inputData>
   <decision name="CardFraudDecision">
     <variable name="CardFraudDecision" typeRef="Any"></variable>
     <informationRequirement>
@@ -160,6 +163,9 @@
     </informationRequirement>
     <informationRequirement>
       <requiredInput href="#inp_merchant_name"></requiredInput>
+    </informationRequirement>
+    <informationRequirement>
+      <requiredInput href="#inp_mcc_6011_txn_count_1hr"></requiredInput>
     </informationRequirement>
   </decision>
 </definitions>

@@ -126,8 +126,13 @@
         <variable name="merchant_name" typeRef="string"/>
     </inputData>
 
+    <!-- =========================
+        4 or more transactions in MCC 6011 within 1 hour
+        ========================= -->
 
-
+    <inputData id="inp_mcc_6011_txn_count_1hr" name="mcc_6011_txn_count_1hr">
+        <variable name="mcc_6011_txn_count_1hr" typeRef="number"/>
+    </inputData>
 
 
     <!-- =========================================================
@@ -173,6 +178,8 @@
         <informationRequirement><requiredInput href="#inp_card_terminal_txn_failed_cnt1day"/></informationRequirement>
         <informationRequirement><requiredInput href="#inp_processing_code"/></informationRequirement>
         <informationRequirement><requiredInput href="#inp_merchant_name"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_mcc_6011_txn_count_1hr"/></informationRequirement>
+
 
         <decisionTable hitPolicy="PRIORITY">
 
@@ -208,6 +215,7 @@
                         "TERMINAL_FAILURE_RATIO_HIGH",  <!-- Added for terminal failure ratio rule -->
                         "RISKY_PROCESSING_CODE",  <!-- Added for processing code rule -->
                         "MERCHANT_NAME_PATTERN",  <!-- Added for merchant name pattern rule -->
+                        "MCC_6011_HIGH_FREQ_1HR",
                         "NONE"
                     </text>
                 </outputValues>
@@ -347,6 +355,18 @@
                 <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
                 <outputEntry><text>"RISKY_PROCESSING_CODE"</text></outputEntry>
             </rule>
+            <!-- MCC 6011 high frequency within 1 hour -->
+            <rule>
+                <inputEntry>
+                    <text>
+                        mcc_group_id = "6011" and
+                        mcc_6011_txn_count_1hr != null and
+                        mcc_6011_txn_count_1hr >= 4
+                    </text>
+                </inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+                <outputEntry><text>"MCC_6011_HIGH_FREQ_1HR"</text></outputEntry>
+            </rule>
             <rule>
                 <inputEntry>
                     <text>
@@ -361,6 +381,9 @@
                 <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
                 <outputEntry><text>"MERCHANT_NAME_PATTERN"</text></outputEntry>
             </rule>
+
+            
+
 
             <!-- =========================
                  DEFAULT

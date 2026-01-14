@@ -115,6 +115,8 @@ public class CardFraudOrchestratorResource {
         target.put("processing_code", asString(source.get("processing_code")));
         target.put("merchant_name", asString(source.get("merchant_name")));
         target.put("txn_amount", asNumber(source.get("txn_amount"), 0));
+        target.put("mcc_6011_txn_count_1hr", asNumber(source.get("mcc_6011_txn_count_1hr"), 0));
+
     }
 
     private void addIndividualThresholds(Map<String, Object> input) {
