@@ -502,3 +502,16 @@ curl -X POST http: //localhost:8080/CardFraudDecision -H "Content-Type: applicat
     "fraud_decision": "SUSPICIOUS",
     "evaluated_at": "2026-01-13T14:34:34.320534Z"
 }%
+
+
+curl -X POST http: //localhost:8080/CardFraudDecision \
+-H "Content-Type: application/json" \
+-d '{
+    "txn_id": "TEST_ARUBA",
+    "txn_channel": "ECOM",
+    "txn_country": "Bangladesh",
+    "product_code": "CREDIT_CARD",
+    "mcc_group_id": "5411",
+    "is_3ds_authenticated": true,
+    "ml_fraud_score_card": 0.1
+}'
