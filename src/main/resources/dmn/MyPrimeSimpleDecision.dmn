@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+    xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+    xmlns:feel="https://www.omg.org/spec/DMN/20191111/FEEL/"
+    id="myprime-simple-decision"
+    name="MyPrimeSimpleDecision"
+    namespace="https://primebank.com/dmn/myprime">
+
+    <inputData id="inp_transaction_amount" name="transaction_amount">
+        <variable name="transaction_amount" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_is_new_device" name="is_new_device">
+        <variable name="is_new_device" typeRef="boolean"/>
+    </inputData>
+
+    <inputData id="inp_is_new_beneficiary" name="is_new_beneficiary">
+        <variable name="is_new_beneficiary" typeRef="boolean"/>
+    </inputData>
+
+    <inputData id="inp_failed_logins_last_1hr" name="failed_logins_last_1hr">
+        <variable name="failed_logins_last_1hr" typeRef="number"/>
+    </inputData>
+
+    <inputData id="inp_xgboost_ml_score" name="xgboost_ml_score">
+        <variable name="xgboost_ml_score" typeRef="number"/>
+    </inputData>
+
+    <decision name="MyPrimeSimpleDecision">
+        <variable name="MyPrimeSimpleDecision" typeRef="Any"/>
+
+        <informationRequirement><requiredInput href="#inp_transaction_amount"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_is_new_device"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_is_new_beneficiary"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_failed_logins_last_1hr"/></informationRequirement>
+        <informationRequirement><requiredInput href="#inp_xgboost_ml_score"/></informationRequirement>
+
+        <decisionTable hitPolicy="PRIORITY">
+
+            <input>
+                <inputExpression typeRef="boolean">
+                    <text>true</text>
+                </inputExpression>
+            </input>
+
+            <output name="fraud_decision" typeRef="string">
+                <outputValues>
+                    <text>"FRAUD","SUSPICIOUS","NORMAL"</text>
+                </outputValues>
+            </output>
+
+            <output name="fraud_reason" typeRef="string">
+                <outputValues>
+                    <text>"HIGH_ML_SCORE","NEW_DEVICE_AND_BENEFICIARY","MULTIPLE_FAILED_LOGINS","LARGE_AMOUNT","NONE"</text>
+                </outputValues>
+            </output>
+
+            <rule>
+                <inputEntry><text>xgboost_ml_score &gt;= 0.7</text></inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"HIGH_ML_SCORE"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>is_new_device = true and is_new_beneficiary = true</text></inputEntry>
+                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"NEW_DEVICE_AND_BENEFICIARY"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>failed_logins_last_1hr &gt;= 3</text></inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+                <outputEntry><text>"MULTIPLE_FAILED_LOGINS"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>transaction_amount &gt; 100000</text></inputEntry>
+                <outputEntry><text>"SUSPICIOUS"</text></outputEntry>
+                <outputEntry><text>"LARGE_AMOUNT"</text></outputEntry>
+            </rule>
+
+            <rule>
+                <inputEntry><text>true</text></inputEntry>
+                <outputEntry><text>"NORMAL"</text></outputEntry>
+                <outputEntry><text>"NONE"</text></outputEntry>
+            </rule>
+
+        </decisionTable>
+    </decision>
+</definitions>
