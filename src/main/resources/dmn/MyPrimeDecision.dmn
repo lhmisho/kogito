@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             xmlns:feel="https://www.omg.org/spec/DMN/20191111/FEEL/"
+             id="myprime-decision"
+             name="MyPrimeDecision"
+             namespace="https://primebank.com/dmn/myprime">
+
+    <!-- =========================
+         INPUTS FROM TRANSACTION
+         ========================= -->
+    <inputData id="input_xgboost_ml_score" name="xgboost_ml_score">
+        <variable name="xgboost_ml_score" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="input_transaction_amount" name="transaction_amount">
+        <variable name="transaction_amount" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="input_is_new_device" name="is_new_device">
+        <variable name="is_new_device" typeRef="boolean"/>
+    </inputData>
+    
+    <inputData id="input_is_new_beneficiary" name="is_new_beneficiary">
+        <variable name="is_new_beneficiary" typeRef="boolean"/>
+    </inputData>
+    
+    <inputData id="input_failed_logins_last_1hr" name="failed_logins_last_1hr">
+        <variable name="failed_logins_last_1hr" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="input_txn_count_1hr" name="txn_count_1hr">
+        <variable name="txn_count_1hr" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="input_txn_amount_1hr" name="txn_amount_1hr">
+        <variable name="txn_amount_1hr" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="input_txn_count_24hr" name="txn_count_24hr">
+        <variable name="txn_count_24hr" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="input_txn_amount_24hr" name="txn_amount_24hr">
+        <variable name="txn_amount_24hr" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="input_country_count_24hr" name="country_count_24hr">
+        <variable name="country_count_24hr" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="input_city_count_24hr" name="city_count_24hr">
+        <variable name="city_count_24hr" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="input_is_odd_hours" name="is_odd_hours">
+        <variable name="is_odd_hours" typeRef="boolean"/>
+    </inputData>
+    
+    <inputData id="input_mcc_code" name="mcc_code">
+        <variable name="mcc_code" typeRef="string"/>
+    </inputData>
+    
+    <inputData id="input_new_devices_7days" name="new_devices_7days">
+        <variable name="new_devices_7days" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="input_new_beneficiaries_7days" name="new_beneficiaries_7days">
+        <variable name="new_beneficiaries_7days" typeRef="number"/>
+    </inputData>
+
+    <!-- =========================
+         THRESHOLDS FROM SERVICE
+         ========================= -->
+    <inputData id="threshold_ml_fraud" name="ML_FRAUD_THRESHOLD">
+        <variable name="ML_FRAUD_THRESHOLD" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="threshold_large_amount" name="LARGE_AMOUNT_THRESHOLD">
+        <variable name="LARGE_AMOUNT_THRESHOLD" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="threshold_very_large_amount" name="VERY_LARGE_AMOUNT_THRESHOLD">
+        <variable name="VERY_LARGE_AMOUNT_THRESHOLD" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="threshold_failed_logins_suspicious" name="FAILED_LOGINS_SUSPICIOUS_THRESHOLD">
+        <variable name="FAILED_LOGINS_SUSPICIOUS_THRESHOLD" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="threshold_failed_logins_fraud" name="FAILED_LOGINS_FRAUD_THRESHOLD">
+        <variable name="FAILED_LOGINS_FRAUD_THRESHOLD" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="threshold_txn_count_1hr" name="TX_COUNT_1HR_THRESHOLD">
+        <variable name="TX_COUNT_1HR_THRESHOLD" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="threshold_txn_amount_1hr" name="TX_AMOUNT_1HR_THRESHOLD">
+        <variable name="TX_AMOUNT_1HR_THRESHOLD" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="threshold_txn_count_24hr" name="TX_COUNT_24HR_THRESHOLD">
+        <variable name="TX_COUNT_24HR_THRESHOLD" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="threshold_txn_amount_24hr" name="TX_AMOUNT_24HR_THRESHOLD">
+        <variable name="TX_AMOUNT_24HR_THRESHOLD" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="threshold_max_countries" name="MAX_COUNTRIES_24HR">
+        <variable name="MAX_COUNTRIES_24HR" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="threshold_max_cities" name="MAX_CITIES_24HR">
+        <variable name="MAX_CITIES_24HR" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="threshold_max_new_devices" name="MAX_NEW_DEVICES_7DAYS">
+        <variable name="MAX_NEW_DEVICES_7DAYS" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="threshold_max_new_beneficiaries" name="MAX_NEW_BENEFICIARIES_7DAYS">
+        <variable name="MAX_NEW_BENEFICIARIES_7DAYS" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="suspicious_mcc_list" name="SUSPICIOUS_MCC_LIST">
+        <variable name="SUSPICIOUS_MCC_LIST" typeRef="string"/>
+    </inputData>
+
+    <!-- =========================
+         DECISION WITH COMPLEX RULES
+         ========================= -->
+    <decision name="MyPrimeDecision" id="d1">
+        <variable name="MyPrimeDecision" typeRef="Any"/>
+        
+        <!-- Information Requirements for Transaction Inputs -->
+        <informationRequirement><requiredInput href="#input_xgboost_ml_score"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input_transaction_amount"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input_is_new_device"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input_is_new_beneficiary"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input_failed_logins_last_1hr"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input_txn_count_1hr"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input_txn_amount_1hr"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input_txn_count_24hr"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input_txn_amount_24hr"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input_country_count_24hr"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input_city_count_24hr"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input_is_odd_hours"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input_mcc_code"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input_new_devices_7days"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input_new_beneficiaries_7days"/></informationRequirement>
+        
+        <!-- Information Requirements for Thresholds -->
+        <informationRequirement><requiredInput href="#threshold_ml_fraud"/></informationRequirement>
+        <informationRequirement><requiredInput href="#threshold_large_amount"/></informationRequirement>
+        <informationRequirement><requiredInput href="#threshold_very_large_amount"/></informationRequirement>
+        <informationRequirement><requiredInput href="#threshold_failed_logins_suspicious"/></informationRequirement>
+        <informationRequirement><requiredInput href="#threshold_failed_logins_fraud"/></informationRequirement>
+        <informationRequirement><requiredInput href="#threshold_txn_count_1hr"/></informationRequirement>
+        <informationRequirement><requiredInput href="#threshold_txn_amount_1hr"/></informationRequirement>
+        <informationRequirement><requiredInput href="#threshold_txn_count_24hr"/></informationRequirement>
+        <informationRequirement><requiredInput href="#threshold_txn_amount_24hr"/></informationRequirement>
+        <informationRequirement><requiredInput href="#threshold_max_countries"/></informationRequirement>
+        <informationRequirement><requiredInput href="#threshold_max_cities"/></informationRequirement>
+        <informationRequirement><requiredInput href="#threshold_max_new_devices"/></informationRequirement>
+        <informationRequirement><requiredInput href="#threshold_max_new_beneficiaries"/></informationRequirement>
+        <informationRequirement><requiredInput href="#suspicious_mcc_list"/></informationRequirement>
+
+        <!-- Complex FEEL expression implementing 29 rules -->
+        <literalExpression>
+            <text>
+                {
+                    fraud_decision: 
+                        /* RULE 1-2: ML Score based */
+                        if xgboost_ml_score >= ML_FRAUD_THRESHOLD then "HIGH RISK"
+                        
+                        /* RULE 3-4: Very large amount */
+                        else if transaction_amount >= VERY_LARGE_AMOUNT_THRESHOLD then "HIGH RISK"
+                        
+                        /* RULE 5-6: Extreme failed logins */
+                        else if failed_logins_last_1hr >= FAILED_LOGINS_FRAUD_THRESHOLD then "HIGH RISK"
+                        
+                        /* RULE 7-8: High velocity fraud */
+                        else if txn_count_24hr >= TX_COUNT_24HR_THRESHOLD then "HIGH RISK"
+                        else if txn_amount_24hr >= TX_AMOUNT_24HR_THRESHOLD then "HIGH RISK"
+                        
+                        /* RULE 9-10: New device + beneficiary (combined risk) */
+                        else if is_new_device and is_new_beneficiary then "HIGH RISK"
+                        
+                        /* RULE 11-12: Excessive new devices/beneficiaries */
+                        else if new_devices_7days >= MAX_NEW_DEVICES_7DAYS then "HIGH RISK"
+                        else if new_beneficiaries_7days >= MAX_NEW_BENEFICIARIES_7DAYS then "HIGH RISK"
+                        
+                        /* RULE 13-16: SUSPICIOUS rules */
+                        else if transaction_amount >= LARGE_AMOUNT_THRESHOLD then "SUSPICIOUS"
+                        else if failed_logins_last_1hr >= FAILED_LOGINS_SUSPICIOUS_THRESHOLD then "SUSPICIOUS"
+                        else if txn_count_1hr >= TX_COUNT_1HR_THRESHOLD then "SUSPICIOUS"
+                        else if txn_amount_1hr >= TX_AMOUNT_1HR_THRESHOLD then "SUSPICIOUS"
+                        
+                        /* RULE 17-18: Geographic dispersion */
+                        else if country_count_24hr >= MAX_COUNTRIES_24HR then "SUSPICIOUS"
+                        else if city_count_24hr >= MAX_CITIES_24HR then "SUSPICIOUS"
+                        
+                        /* RULE 19-20: Odd hours with risk */
+                        else if is_odd_hours and transaction_amount >= 50000 then "SUSPICIOUS"
+                        else if is_odd_hours and is_new_device then "SUSPICIOUS"
+                        
+                        /* RULE 21-22: MCC code checks */
+                        else if mcc_code in split(SUSPICIOUS_MCC_LIST, ",") then "SUSPICIOUS"
+                        
+                        /* RULE 23-24: Individual new device/beneficiary */
+                        else if is_new_device then "SUSPICIOUS"
+                        else if is_new_beneficiary then "SUSPICIOUS"
+                        
+                        /* RULE 25-28: Moderate thresholds */
+                        else if xgboost_ml_score >= 0.5 then "SUSPICIOUS"  /* ML_SUSPICIOUS_THRESHOLD */
+                        
+                        /* RULE 29: Default LEGITIMATE */
+                        else "LEGITIMATE",
+                    
+                    fraud_reason: 
+                        if xgboost_ml_score >= ML_FRAUD_THRESHOLD then "HIGH_ML_SCORE"
+                        else if transaction_amount >= VERY_LARGE_AMOUNT_THRESHOLD then "VERY_LARGE_AMOUNT"
+                        else if failed_logins_last_1hr >= FAILED_LOGINS_FRAUD_THRESHOLD then "EXTREME_FAILED_LOGINS"
+                        else if txn_count_24hr >= TX_COUNT_24HR_THRESHOLD then "HIGH_VELOCITY_24HR_COUNT"
+                        else if txn_amount_24hr >= TX_AMOUNT_24HR_THRESHOLD then "HIGH_VELOCITY_24HR_AMOUNT"
+                        else if is_new_device and is_new_beneficiary then "NEW_DEVICE_AND_BENEFICIARY"
+                        else if new_devices_7days >= MAX_NEW_DEVICES_7DAYS then "EXCESSIVE_NEW_DEVICES"
+                        else if new_beneficiaries_7days >= MAX_NEW_BENEFICIARIES_7DAYS then "EXCESSIVE_NEW_BENEFICIARIES"
+                        else if transaction_amount >= LARGE_AMOUNT_THRESHOLD then "LARGE_AMOUNT"
+                        else if failed_logins_last_1hr >= FAILED_LOGINS_SUSPICIOUS_THRESHOLD then "MULTIPLE_FAILED_LOGINS"
+                        else if txn_count_1hr >= TX_COUNT_1HR_THRESHOLD then "HIGH_VELOCITY_1HR_COUNT"
+                        else if txn_amount_1hr >= TX_AMOUNT_1HR_THRESHOLD then "HIGH_VELOCITY_1HR_AMOUNT"
+                        else if country_count_24hr >= MAX_COUNTRIES_24HR then "MULTI_COUNTRY_ACTIVITY"
+                        else if city_count_24hr >= MAX_CITIES_24HR then "MULTI_CITY_ACTIVITY"
+                        else if is_odd_hours and transaction_amount >= 50000 then "ODD_HOURS_LARGE_TXN"
+                        else if is_odd_hours and is_new_device then "ODD_HOURS_NEW_DEVICE"
+                        else if mcc_code in split(SUSPICIOUS_MCC_LIST, ",") then "SUSPICIOUS_MCC_CODE"
+                        else if is_new_device then "NEW_DEVICE"
+                        else if is_new_beneficiary then "NEW_BENEFICIARY"
+                        else if xgboost_ml_score >= 0.5 then "MODERATE_ML_SCORE"
+                        else "NONE"
+                }
+            </text>
+        </literalExpression>
+    </decision>
+</definitions>

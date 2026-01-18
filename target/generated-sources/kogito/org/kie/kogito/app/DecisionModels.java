@@ -22,7 +22,7 @@ public class DecisionModels extends org.kie.kogito.dmn.AbstractDecisionModels {
 
     static {
         init(/* arguments provided during codegen */
-        null, null, readResource(Application.class.getResourceAsStream("/dmn/MyPrimeFraudDecision.dmn"), "UTF-8"), readResource(Application.class.getResourceAsStream("/dmn/fraud-action.dmn"), "UTF-8"), readResource(Application.class.getResourceAsStream("/dmn/risk-signals.dmn"), "UTF-8"), readResource(Application.class.getResourceAsStream("/dmn/fraud-decision.dmn"), "UTF-8"), readResource(Application.class.getResourceAsStream("/dmn/CardFraudDecision.dmn"), "UTF-8"), readResource(Application.class.getResourceAsStream("/dmn/risk-score.dmn"), "UTF-8"));
+        null, null, readResource(Application.class.getResourceAsStream("/dmn/MyPrimeDecision.dmn"), "UTF-8"), readResource(Application.class.getResourceAsStream("/dmn/fraud-action.dmn"), "UTF-8"), readResource(Application.class.getResourceAsStream("/dmn/risk-signals.dmn"), "UTF-8"), readResource(Application.class.getResourceAsStream("/dmn/fraud-decision.dmn"), "UTF-8"), readResource(Application.class.getResourceAsStream("/dmn/CardFraudDecision.dmn"), "UTF-8"), readResource(Application.class.getResourceAsStream("/dmn/risk-score.dmn"), "UTF-8"));
     }
 
     @javax.inject.Inject

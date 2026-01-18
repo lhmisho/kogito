@@ -192,7 +192,7 @@
             <!-- OUTPUTS (MANDATORY FOR PRIORITY) -->
             <output name="fraud_decision" typeRef="string">
                 <outputValues>
-                    <text>"FRAUD","SUSPICIOUS","NORMAL"</text>
+                    <text>"HIGH RISK","SUSPICIOUS","LEGITIMATE"</text>
                 </outputValues>
             </output>
 
@@ -226,8 +226,8 @@
                  ========================= -->
 
             <rule>
-                <inputEntry><text>COUNTRY_RISK = "FRAUD"</text></inputEntry>
-                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <inputEntry><text>COUNTRY_RISK = "HIGH RISK"</text></inputEntry>
+                <outputEntry><text>"HIGH RISK"</text></outputEntry>
                 <outputEntry><text>"COUNTRY_BLOCKED"</text></outputEntry>
             </rule>
 
@@ -239,25 +239,25 @@
                         ml_fraud_score_card >= ML_FRAUD_THRESHOLD
                     </text>
                 </inputEntry>
-                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"HIGH RISK"</text></outputEntry>
                 <outputEntry><text>"ML_FRAUD_SCORE_HIGH"</text></outputEntry>
             </rule>
 
             <rule>
                 <inputEntry><text>is_magstripe = true</text></inputEntry>
-                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"HIGH RISK"</text></outputEntry>
                 <outputEntry><text>"MAGSTRIPE_BLOCK"</text></outputEntry>
             </rule>
 
             <rule>
                 <inputEntry><text>txn_channel="ECOM" and wrong_cvv_10 >= 2</text></inputEntry>
-                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"HIGH RISK"</text></outputEntry>
                 <outputEntry><text>"WRONG_CVV"</text></outputEntry>
             </rule>
 
             <rule>
                 <inputEntry><text>txn_channel="ECOM" and wrong_pin_10 >= 2</text></inputEntry>
-                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"HIGH RISK"</text></outputEntry>
                 <outputEntry><text>"WRONG_PIN"</text></outputEntry>
             </rule>
 
@@ -268,7 +268,7 @@
                         (txn_amount_5 >= VELOCITY_5_AMOUNT)
                     </text>
                 </inputEntry>
-                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"HIGH RISK"</text></outputEntry>
                 <outputEntry><text>"VELOCITY_5MIN"</text></outputEntry>
             </rule>
 
@@ -321,7 +321,7 @@
                         (txn_amount_30 >= VELOCITY_30_AMOUNT)
                     </text>
                 </inputEntry>
-                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"HIGH RISK"</text></outputEntry>
                 <outputEntry><text>"VELOCITY_30MIN"</text></outputEntry>
             </rule>
 
@@ -331,7 +331,7 @@
                         card_failed_cnt1day > FAILED_TXN_1DAY
                     </text>
                 </inputEntry>
-                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"HIGH RISK"</text></outputEntry>
                 <outputEntry><text>"CARD_FAILED_ATTEMPTS_1DAY"</text></outputEntry>
             </rule>
 
@@ -342,7 +342,7 @@
                         (card_terminal_txn_failed_cnt1day / card_terminal_txn_cnt1day) >= 0.5
                     </text>
                 </inputEntry>
-                <outputEntry><text>"FRAUD"</text></outputEntry>
+                <outputEntry><text>"HIGH RISK"</text></outputEntry>
                 <outputEntry><text>"TERMINAL_FAILURE_RATIO_HIGH"</text></outputEntry>
             </rule>
 
@@ -391,7 +391,7 @@
 
             <rule>
                 <inputEntry><text>true</text></inputEntry>
-                <outputEntry><text>"NORMAL"</text></outputEntry>
+                <outputEntry><text>"LEGITIMATE"</text></outputEntry>
                 <outputEntry><text>"NONE"</text></outputEntry>
             </rule>
 

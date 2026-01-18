@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             xmlns:feel="https://www.omg.org/spec/DMN/20191111/FEEL/"
+             id="myprime-decision_bk"
+             name="MyPrimeDecision_bk"
+             namespace="https://primebank.com/dmn/myprime">
+
+
+    <!-- Inputs -->
+    <inputData id="input1" name="xgboost_ml_score">
+        <variable name="xgboost_ml_score" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="input2" name="transaction_amount">
+        <variable name="transaction_amount" typeRef="number"/>
+    </inputData>
+    
+    <inputData id="input3" name="is_new_device">
+        <variable name="is_new_device" typeRef="boolean"/>
+    </inputData>
+    
+    <inputData id="input4" name="is_new_beneficiary">
+        <variable name="is_new_beneficiary" typeRef="boolean"/>
+    </inputData>
+    
+    <inputData id="input5" name="failed_logins_last_1hr">
+        <variable name="failed_logins_last_1hr" typeRef="number"/>
+    </inputData>
+
+    <!-- Decision -->
+    <decision name="MyPrimeDecision" id="d1">
+        <variable name="MyPrimeDecision" typeRef="Any"/>
+        
+        <informationRequirement><requiredInput href="#input1"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input2"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input3"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input4"/></informationRequirement>
+        <informationRequirement><requiredInput href="#input5"/></informationRequirement>
+
+        <!-- Simple FEEL expression for all rules -->
+        <literalExpression>
+            <text>
+                {
+                    fraud_decision: 
+                        if xgboost_ml_score >= 0.7 then "FRAUD"
+                        else if is_new_device and is_new_beneficiary then "FRAUD"
+                        else if failed_logins_last_1hr >= 3 then "SUSPICIOUS"
+                        else if transaction_amount > 100000 then "SUSPICIOUS"
+                        else "NORMAL",
+                        
+                    fraud_reason: 
+                        if xgboost_ml_score >= 0.7 then "HIGH_ML_SCORE"
+                        else if is_new_device and is_new_beneficiary then "NEW_DEVICE_AND_BENEFICIARY"
+                        else if failed_logins_last_1hr >= 3 then "MULTIPLE_FAILED_LOGINS"
+                        else if transaction_amount > 100000 then "LARGE_AMOUNT"
+                        else "NONE"
+                }
+            </text>
+        </literalExpression>
+    </decision>
+</definitions>

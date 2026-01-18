@@ -1,0 +1,72 @@
+Test 1: High ML Score (FRAUD)
+curl -X POST http: //localhost:8080/myprime/decision \
+  -H "Content-Type: application/json" \
+  -d '{
+  "transaction_id": "TXN-ML-HIGH-001",
+  "xgboost_ml_score": 0.88,
+  "transaction_amount": 50000,
+  "is_new_device": false,
+  "is_new_beneficiary": false,
+  "failed_logins_last_1hr": 0
+}'
+  {
+  "transaction_id": "TXN-ML-HIGH-001",
+  "success": true,
+  "fraud_reason": "HIGH_ML_SCORE",
+  "fraud_decision": "FRAUD",
+  "evaluated_at": "2026-01-14T11:08:42.352996Z"
+}
+
+Test 2: Very Large Amount (FRAUD)
+curl -X POST http: //localhost:8080/myprime/decision \
+  -H "Content-Type: application/json" \
+  -d '{
+  "transaction_id": "TXN-VERY-LARGE-001",
+  "xgboost_ml_score": 0.45,
+  "transaction_amount": 750000,
+  "is_new_device": false,
+  "is_new_beneficiary": false
+}'
+{
+  "transaction_id": "TXN-VERY-LARGE-001",
+  "success": true,
+  "fraud_reason": "VERY_LARGE_AMOUNT",
+  "fraud_decision": "FRAUD",
+  "evaluated_at": "2026-01-14T11:09:43.980489Z"
+}
+
+Test 3: New Device + New Beneficiary (FRAUD)
+curl -X POST http: //localhost:8080/myprime/decision \
+  -H "Content-Type: application/json" \
+  -d '{
+  "transaction_id": "TXN-NEW-BOTH-001",
+  "xgboost_ml_score": 0.35,
+  "transaction_amount": 25000,
+  "is_new_device": true,
+  "is_new_beneficiary": true,
+  "failed_logins_last_1hr": 0
+}'
+{
+  "transaction_id": "TXN-NEW-BOTH-001",
+  "success": true,
+  "fraud_reason": "NEW_DEVICE_AND_BENEFICIARY",
+  "fraud_decision": "FRAUD",
+  "evaluated_at": "2026-01-14T11:10:24.455953Z"
+}%
+
+Test 4: Extreme Failed Logins (FRAUD)
+curl -X POST http: //localhost:8080/myprime/decision \
+  -H "Content-Type: application/json" \
+  -d '{
+  "transaction_id": "TXN-FAILED-LOGINS-001",
+  "xgboost_ml_score": 0.25,
+  "transaction_amount": 10000,
+  "failed_logins_last_1hr": 15
+}'
+  {
+  "transaction_id": "TXN-FAILED-LOGINS-001",
+  "success": true,
+  "fraud_reason": "EXTREME_FAILED_LOGINS",
+  "fraud_decision": "FRAUD",
+  "evaluated_at": "2026-01-14T11:10:48.240048Z"
+}%

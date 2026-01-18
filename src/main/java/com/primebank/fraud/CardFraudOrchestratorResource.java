@@ -138,6 +138,27 @@ public class CardFraudOrchestratorResource {
         return model.evaluateAll(model.newContext(input)).getContext().getAll();
     }
 
+    private static final Map<String, String> FRAUD_REASON_LABELS = Map.ofEntries(
+        Map.entry("COUNTRY_BLOCKED", "Transaction from Blocked Country"),
+        Map.entry("COUNTRY_HIGH_RISK", "High Risk Country"),
+        Map.entry("ML_FRAUD_SCORE_HIGH", "High Fraud Risk Score"),
+        Map.entry("MAGSTRIPE_BLOCK", "Magstripe Transactions Blocked"),
+        Map.entry("WRONG_CVV", "Multiple Wrong CVV Attempts"), // 1
+        Map.entry("WRONG_PIN", "Multiple Wrong PIN Attempts"), // 1
+        Map.entry("VELOCITY_5MIN", "High Transaction Velocity (5 Minutes)"), // 1
+        Map.entry("VELOCITY_30MIN", "High Transaction Velocity (30 Minutes)"), // 1
+        Map.entry("PRODUCT_MCC_RESTRICT", "Restricted Product and MCC Combination"),
+        Map.entry("NON_3DS_TRANSACTION", "Non-3DS E-Commerce Transaction"),
+        Map.entry("MULTI_CCY", "Multiple Currencies Used"), // Too many card present multi ccy in 1 hour
+        Map.entry("MCC_FLAGGED", "High-Risk Merchant Category (MCC_FLAGGED)"),
+        Map.entry("CARD_FAILED_ATTEMPTS_1DAY", "Too Many Failed Card Attempts"),
+        Map.entry("TERMINAL_FAILURE_RATIO_HIGH", "Too many failed ratio terminal"), // 1
+        Map.entry("RISKY_PROCESSING_CODE", "Risky Processing Code"),
+        Map.entry("MERCHANT_NAME_PATTERN", "Suspicious Merchant Name"),
+        Map.entry("MCC_6011_HIGH_FREQ_1HR", "High Frequency ATM Withdrawals"),
+        Map.entry("NONE", "No Risk Detected")
+    );
+
     private Map<String, Object> buildResponse(Map<String, Object> txn, Map<String, Object> dmnResult) {
         @SuppressWarnings("unchecked")
         Map<String, Object> decision = (Map<String, Object>) dmnResult.get(DMN_MODEL_NAME);
@@ -149,7 +170,8 @@ public class CardFraudOrchestratorResource {
         Map<String, Object> response = new HashMap<>();
         response.put("transaction_id", txn.get("txn_id"));
         response.put("fraud_decision", decision.get("fraud_decision"));
-        response.put("fraud_reason", decision.get("fraud_reason"));
+        // response.put("fraud_reason", decision.get("fraud_reason"));
+        response.put("fraud_reason", FRAUD_REASON_LABELS.getOrDefault(decision.get("fraud_reason"), decision.get("fraud_reason").toString()));
         response.put("evaluated_at", Instant.now().toString());
         response.put("model_version", "1.0");
         
