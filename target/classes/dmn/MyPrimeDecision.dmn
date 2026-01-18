@@ -170,15 +170,9 @@
         <literalExpression>
             <text>
                 {
-                    fraud_decision: 
-                        /* RULE 1-2: ML Score based */
-                        if xgboost_ml_score >= ML_FRAUD_THRESHOLD then "HIGH RISK"
-                        
-                        /* RULE 3-4: Very large amount */
-                        else if transaction_amount >= VERY_LARGE_AMOUNT_THRESHOLD then "HIGH RISK"
-                        
+                    fraud_decision:  
                         /* RULE 5-6: Extreme failed logins */
-                        else if failed_logins_last_1hr >= FAILED_LOGINS_FRAUD_THRESHOLD then "HIGH RISK"
+                        if failed_logins_last_1hr >= FAILED_LOGINS_FRAUD_THRESHOLD then "HIGH RISK"
                         
                         /* RULE 7-8: High velocity fraud */
                         else if txn_count_24hr >= TX_COUNT_24HR_THRESHOLD then "HIGH RISK"
@@ -215,13 +209,17 @@
                         /* RULE 25-28: Moderate thresholds */
                         else if xgboost_ml_score >= 0.5 then "SUSPICIOUS"  /* ML_SUSPICIOUS_THRESHOLD */
                         
+                        /* RULE 3-4: Very large amount */
+                        else if transaction_amount >= VERY_LARGE_AMOUNT_THRESHOLD then "HIGH RISK"
+
+                        /* RULE 1-2: ML Score based */
+                        else if xgboost_ml_score >= ML_FRAUD_THRESHOLD then "HIGH RISK"
+
                         /* RULE 29: Default LEGITIMATE */
                         else "LEGITIMATE",
                     
                     fraud_reason: 
-                        if xgboost_ml_score >= ML_FRAUD_THRESHOLD then "HIGH_ML_SCORE"
-                        else if transaction_amount >= VERY_LARGE_AMOUNT_THRESHOLD then "VERY_LARGE_AMOUNT"
-                        else if failed_logins_last_1hr >= FAILED_LOGINS_FRAUD_THRESHOLD then "EXTREME_FAILED_LOGINS"
+                        if failed_logins_last_1hr >= FAILED_LOGINS_FRAUD_THRESHOLD then "EXTREME_FAILED_LOGINS"
                         else if txn_count_24hr >= TX_COUNT_24HR_THRESHOLD then "HIGH_VELOCITY_24HR_COUNT"
                         else if txn_amount_24hr >= TX_AMOUNT_24HR_THRESHOLD then "HIGH_VELOCITY_24HR_AMOUNT"
                         else if is_new_device and is_new_beneficiary then "NEW_DEVICE_AND_BENEFICIARY"
@@ -239,6 +237,8 @@
                         else if is_new_device then "NEW_DEVICE"
                         else if is_new_beneficiary then "NEW_BENEFICIARY"
                         else if xgboost_ml_score >= 0.5 then "MODERATE_ML_SCORE"
+                        else if xgboost_ml_score >= ML_FRAUD_THRESHOLD then "HIGH_ML_SCORE"
+                        else if transaction_amount >= VERY_LARGE_AMOUNT_THRESHOLD then "VERY_LARGE_AMOUNT"
                         else "NONE"
                 }
             </text>
