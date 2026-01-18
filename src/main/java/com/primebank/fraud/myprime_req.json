@@ -3,7 +3,8 @@ curl -X POST http: //localhost:8080/myprime/decision \
   -H "Content-Type: application/json" \
   -d '{
   "transaction_id": "TXN-ML-HIGH-001",
-  "xgboost_ml_score": 0.88,
+  "xgboost_ml_score": 0.55,
+  "xgboost_ml_reason": "AMAR SUNOAR BANGLA AMI TUMAI VALO VAGI",
   "transaction_amount": 50000,
   "is_new_device": false,
   "is_new_beneficiary": false,

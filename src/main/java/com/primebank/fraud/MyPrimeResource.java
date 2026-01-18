@@ -99,6 +99,23 @@ public class MyPrimeResource {
                 throw new IllegalStateException("DMN model not found: " + DMN_MODEL_NAME);
             }
             
+            // initialize response
+            Map<String, Object> response = new HashMap<>();
+
+            // Check high risk ml_score with reason
+            double xgboost_ml_score = Double.parseDouble(transaction.getOrDefault("xgboost_ml_score", 0.0).toString());
+            String fraud_reason = transaction.getOrDefault("xgboost_ml_reason", "").toString();
+            if (xgboost_ml_score >= thresholdService.getAsDouble("ML_FRAUD_THRESHOLD")){
+                response.put("success", true);
+                response.put("transaction_id", transaction.get("transaction_id"));
+                response.put("evaluated_at", Instant.now().toString());
+
+                response.put("fraud_decision", (Object) fraud_reason);
+                response.put("fraud_reason", MYPRIME_FRAUD_REASON_LABELS.getOrDefault("HIGH RISK", "HIGH RISK"));
+                return Response.ok(response).build();
+            }
+
+            
             // Prepare DMN input with defaults and thresholds
             Map<String, Object> dmnInput = new HashMap<>();
             
@@ -137,7 +154,6 @@ public class MyPrimeResource {
             }
             
             // Build response
-            Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("transaction_id", transaction.get("transaction_id"));
             response.put("evaluated_at", Instant.now().toString());
@@ -250,7 +266,7 @@ public class MyPrimeResource {
         response.put("count", thresholdService.getAllThresholds().size());
         return Response.ok(response).build();
     }
-
+ 
     @POST
     @Path("/thresholds/reload")
     public Response reloadThresholds() {

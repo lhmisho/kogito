@@ -30,6 +30,22 @@ public class CardFraudOrchestratorResource {
     @POST
     public Response decide(Map<String, Object> txn) {
         try {
+
+            // check ml high score 
+            double ml_score = Double.parseDouble(txn.get("ml_fraud_score_card").toString());
+            String fraud_reason_card = txn.get("ml_fraud_reason_card").toString();
+
+            if(ml_score >= getAsDouble("ML_FRAUD_THRESHOLD")){
+                Map<String, Object> response = new HashMap<>();
+                response.put("transaction_id", txn.get("txn_id"));
+                response.put("fraud_decision", "HIGH RISK");
+                // response.put("fraud_reason", decision.get("fraud_reason"));
+                response.put("fraud_reason", (Object) fraud_reason_card);
+                response.put("evaluated_at", Instant.now().toString());
+                response.put("model_version", "1.0");
+                return Response.ok(response).build();
+            }
+
             // Build DMN input context
             Map<String, Object> dmnInput = buildDmnInput(txn);
             
@@ -141,7 +157,7 @@ public class CardFraudOrchestratorResource {
     private static final Map<String, String> FRAUD_REASON_LABELS = Map.ofEntries(
         Map.entry("COUNTRY_BLOCKED", "Transaction from Blocked Country"),
         Map.entry("COUNTRY_HIGH_RISK", "High Risk Country"),
-        Map.entry("ML_FRAUD_SCORE_HIGH", "High Fraud Risk Score"),
+        Map.entry("ML_FRAUD_SCORE_HIGH", "High Fraud Risk Score"), 
         Map.entry("MAGSTRIPE_BLOCK", "Magstripe Transactions Blocked"),
         Map.entry("WRONG_CVV", "Multiple Wrong CVV Attempts"), // 1
         Map.entry("WRONG_PIN", "Multiple Wrong PIN Attempts"), // 1
@@ -206,5 +222,13 @@ public class CardFraudOrchestratorResource {
         } catch (Exception e) {
             return defaultVal;
         }
+    }
+
+    public Double getAsDouble(String key) {
+        Object value = thresholdService.get(key);
+        if (value instanceof Number) {
+            return ((Number) value).doubleValue();
+        }
+        return 0.0;
     }
 }
