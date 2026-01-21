@@ -110,8 +110,8 @@ public class MyPrimeResource {
                 response.put("transaction_id", transaction.get("transaction_id"));
                 response.put("evaluated_at", Instant.now().toString());
 
-                response.put("fraud_decision", (Object) fraud_reason);
-                response.put("fraud_reason", MYPRIME_FRAUD_REASON_LABELS.getOrDefault("HIGH RISK", "HIGH RISK"));
+                response.put("fraud_decision", "HIGH RISK");
+                response.put("fraud_reason", (Object) fraud_reason);
                 return Response.ok(response).build();
             }
 
