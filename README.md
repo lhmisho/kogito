@@ -10,6 +10,8 @@ You can run your application in dev mode that enables live coding using:
 
 ```shell script
 ./mvnw compile quarkus:dev
+mvn quarkus:dev
+java -Dquarkus.profile=dev -jar fraud-decision-service-1.0.0-runner.jar
 ```
 
 > **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
@@ -31,6 +33,7 @@ If you want to build an _über-jar_, execute the following command:
 
 ```shell script
 ./mvnw package -Dquarkus.package.jar.type=uber-jar
+mvn clean package -DskipTests -Dquarkus.package.type=uber-jar
 ```
 
 The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.

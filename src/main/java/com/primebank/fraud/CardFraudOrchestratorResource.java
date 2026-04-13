@@ -33,7 +33,7 @@ public class CardFraudOrchestratorResource {
 
             // check ml high score 
             double ml_score = Double.parseDouble(txn.get("ml_fraud_score_card").toString());
-            String fraud_reason_card = txn.get("ml_fraud_reason_card").toString();
+            String fraud_reason_card = txn.get("ml_fraud_reason_card") == null ? "" :txn.get("ml_fraud_reason_card").toString();
 
             if(ml_score >= getAsDouble("ML_FRAUD_THRESHOLD")){
                 Map<String, Object> response = new HashMap<>();
@@ -45,6 +45,139 @@ public class CardFraudOrchestratorResource {
                 response.put("model_version", "1.0");
                 return Response.ok(response).build();
             }
+
+            String bin = txn.get("bin")==null ? null : txn.get("bin").toString();
+            Integer binUniqueCardCount1 = txn.get("binUniqueCardCount1") == null ? 0 : Integer.parseInt(txn.get("binUniqueCardCount1").toString()); // High-velocity probing
+
+            // binTxnCount1 - Temporal burst
+            Integer binTxnCount1 = txn.get("binTxnCount1") == null ? 0 : Integer.parseInt(txn.get("binTxnCount1").toString());
+
+            // binDeclineRate5 - High decline rate – Mastercard Safety Net
+            double binDeclineRate5 = txn.get("binDeclineRate5") == null ? 0.00 : Double.parseDouble(txn.get("binDeclineRate5").toString());
+
+            // binUniqueMerchantCount5 - Cross-merchant sweep – Visa mass exposure
+            Integer binUniqueMerchantCount5 = txn.get("binUniqueMerchantCount5") == null ? 0 : Integer.parseInt(txn.get("binUniqueMerchantCount5").toString());
+
+            // binSmallAmtTxnCount3 - Micro-amount probing
+            Integer binSmallAmtTxnCount3 = txn.get("binSmallAmtTxnCount3") == null ? 0 : Integer.parseInt(txn.get("binSmallAmtTxnCount3").toString());
+            
+            if(bin != null){
+                Double fraudScore = 0.0;
+                String fraudReason = "";
+                if(binUniqueCardCount1 > getAsInteger("BIN_UNIQUE_CARD_COUNT1")){
+                    String value = getAsInteger("BIN_UNIQUE_CARD_COUNT1").toString();
+
+                    fraudScore = fraudScore + (binUniqueCardCount1 * .3);
+                    fraudReason = fraudReason + "More than " +  value + " unique cards/min on same BIN " + bin + "<br>"; 
+
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("transaction_id", txn.get("txn_id"));
+                    response.put("fraud_decision", "HIGH RISK");
+                    response.put("fraud_reason", fraudReason);
+                    response.put("evaluated_at", Instant.now().toString());
+                    response.put("model_version", "1.0");
+                    return Response.ok(response).build();
+                }else if (binDeclineRate5 > getAsInteger("BIN_DECLINE_RATE5")){
+                    String value = getAsInteger("BIN_DECLINE_RATE5").toString();
+
+                    fraudScore = fraudScore + (binDeclineRate5 * .2);
+                    fraudReason = fraudReason + "More than " + value +"% decline rate in 5 min rolling window on BIN " + bin + "<br>"; 
+
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("transaction_id", txn.get("txn_id"));
+                    response.put("fraud_decision", "HIGH RISK");
+                    response.put("fraud_reason", fraudReason);
+                    response.put("evaluated_at", Instant.now().toString());
+                    response.put("model_version", "1.0");
+                    return Response.ok(response).build();
+                }else if(binSmallAmtTxnCount3 >= getAsInteger("BIN_SMALL_AMT_TXN_COUNT3")){
+                    String value = getAsInteger("BIN_SMALL_AMT_TXN_COUNT3").toString();
+
+                    fraudScore = fraudScore + (binSmallAmtTxnCount3 * .1);
+                    fraudReason = fraudReason + "Suspected card check transactions, More than "+ value +" transactions in 3 min on same BIN " + bin + "<br>"; 
+
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("transaction_id", txn.get("txn_id"));
+                    response.put("fraud_decision", "HIGH RISK");
+                    response.put("fraud_reason", fraudReason);
+                    response.put("evaluated_at", Instant.now().toString());
+                    response.put("model_version", "1.0");
+                    return Response.ok(response).build();
+                }else if(binUniqueMerchantCount5 >= getAsInteger("BIN_UNIQUE_MERCHANT_COUNT5")){
+                    String value = getAsInteger("BIN_UNIQUE_MERCHANT_COUNT5").toString();
+
+                    fraudScore = fraudScore + (binUniqueMerchantCount5 * .2);
+                    fraudReason = fraudReason + "More than " + value +" merchants hit by same BIN "+ bin +" in 5 min" + "<br>";
+
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("transaction_id", txn.get("txn_id"));
+                    response.put("fraud_decision", "HIGH RISK");
+                    response.put("fraud_reason", fraudReason);
+                    response.put("evaluated_at", Instant.now().toString());
+                    response.put("model_version", "1.0");
+                    return Response.ok(response).build();
+                }else if(binTxnCount1 >= getAsInteger("BIN_TXN_COUNT1")){
+                    String value = getAsInteger("BIN_TXN_COUNT1").toString();
+
+                    fraudScore = fraudScore + (binTxnCount1 * .2);
+                    fraudReason = fraudReason + "More than " + value +" txns within 60 seconds (session) on same BIN "+ bin + "<br>";
+
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("transaction_id", txn.get("txn_id"));
+                    response.put("fraud_decision", "HIGH RISK");
+                    response.put("fraud_reason", fraudReason);
+                    response.put("evaluated_at", Instant.now().toString());
+                    response.put("model_version", "1.0");
+                    return Response.ok(response).build();
+                }
+
+                if(fraudScore >= 40 && fraudScore < (getAsDouble("ML_FRAUD_THRESHOLD") * 100)){
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("transaction_id", txn.get("txn_id"));
+                    response.put("fraud_decision", "SUSPECIUS");
+                    response.put("fraud_reason", fraudReason);
+                    response.put("evaluated_at", Instant.now().toString());
+                    response.put("model_version", "1.0");
+                    return Response.ok(response).build();
+                }else if(fraudScore >= (getAsDouble("ML_FRAUD_THRESHOLD") * 100)){
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("transaction_id", txn.get("txn_id"));
+                    response.put("fraud_decision", "HIGH RISK");
+                    response.put("fraud_reason", fraudReason);
+                    response.put("evaluated_at", Instant.now().toString());
+                    response.put("model_version", "1.0");
+                    return Response.ok(response).build();
+                }
+
+                // if(binUniqueCardCount1 > getAsInteger("BIN_UNIQUE_CARD_COUNT1") && binDeclineRate5 > getAsInteger("BIN_DECLINE_RATE5") && binSmallAmtTxnCount3 >= getAsInteger("BIN_SMALL_AMT_TXN_COUNT3") && binUniqueMerchantCount5 >= getAsInteger("BIN_UNIQUE_MERCHANT_COUNT5") && binTxnCount1 >= getAsInteger("BIN_TXN_COUNT1") ){
+                //     String value = getAsInteger("BIN_UNIQUE_CARD_COUNT1").toString();
+                //     String fraudReason = "More than " +  value + " unique cards/min on same BIN " + bin;
+                    
+                //     value = getAsInteger("BIN_DECLINE_RATE5").toString();
+                //     fraudReason = fraudReason + "<br>" + "More than " + value +"% decline rate in 5 min rolling window on BIN " + bin; 
+
+                //     value = getAsInteger("BIN_SMALL_AMT_TXN_COUNT3").toString();
+                //     fraudReason = fraudReason + "<br>" +"Suspected card check transactions, More than "+ value +" transactions in 3 min on same BIN " + bin; 
+
+                //     value = getAsInteger("BIN_UNIQUE_MERCHANT_COUNT5").toString();
+                //     fraudReason = fraudReason + "<br>" + "More than " + value +" merchants hit by same BIN "+ bin +" in 5 min";
+
+                //     value = getAsInteger("BIN_TXN_COUNT1").toString();
+                //     fraudReason = fraudReason + "<br>" + "More than " + value +" txns within 60 seconds (session) on same BIN "+ bin;
+
+
+                //     Map<String, Object> response = new HashMap<>();
+                //     response.put("transaction_id", txn.get("txn_id"));
+                //     response.put("fraud_decision", "HIGH RISK");
+                //     response.put("fraud_reason", fraudReason);
+                //     response.put("evaluated_at", Instant.now().toString());
+                //     response.put("model_version", "1.0");
+                //     return Response.ok(response).build();
+                // }
+
+
+            }
+
 
             // Build DMN input context
             Map<String, Object> dmnInput = buildDmnInput(txn);
@@ -230,5 +363,15 @@ public class CardFraudOrchestratorResource {
             return ((Number) value).doubleValue();
         }
         return 0.0;
+    }
+
+    public Integer getAsInteger(String key) {
+        Object value = thresholdService.get(key);
+        
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        
+        return 0;
     }
 }
