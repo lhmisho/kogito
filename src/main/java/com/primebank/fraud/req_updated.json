@@ -43,7 +43,13 @@ curl -X POST http: //localhost:8080/CardFraudDecision \
     "txn_amount_30": 40000,
     "ml_fraud_score_card": 0.12,
     "is_magstripe": false,
-    "is_3ds_authenticated": true
+    "is_3ds_authenticated": true,
+    "bin": "1234",
+    "binUniqueCardCount1": 21,
+    "binDeclineRate5": 72.12,
+    "binSmallAmtTxnCount3": 50,
+    "binUniqueMerchantCount5": 50,
+    "binTxnCount1": 31
 }'
 {
     "transaction_id": "TXN-6011-001",
@@ -59,11 +65,9 @@ curl -X POST http: //localhost:8080/CardFraudDecision \
 -d '{
     "txn_id": "TEST_PRODUCT_MCC",
     "txn_channel": "ECOM",
-    "txn_country": "BD",
-    "product_code": "CREDIT_CARD",
-    "mcc_group_id": "7273",
-    "is_3ds_authenticated": true,
-    "ml_fraud_score_card": 0.1
+    "ml_fraud_score_card": 0.1,
+    "TOTALWITHDRAWLCOUNTMONTH": 12,
+    "TXN_TYPE": "MIS"
 }'
 {
     "transaction_id": "TEST_PRODUCT_MCC",
@@ -546,3 +550,25 @@ curl -X POST http: //localhost:8080/CardFraudDecision \
     "is_3ds_authenticated": true,
     "ml_fraud_score_card": 0.1
 }'
+
+Test 2: MIS TESTS
+curl -X POST http: //localhost:8080/CardFraudDecision \
+-H "Content-Type: application/json" \
+-d '{
+    "txn_id": "TEST_PRODUCT_MCC",
+    "txn_channel": "ECOM",
+    "TOTALWITHDRAWLCOUNTMONTH": 12,
+    "TXN_TYPE": "MIS",
+    "TOTALWITHDRAWLAMOUNTMONTH": 50000,
+    "TOTALDEPOSITAMOUNTDAY": 200000,
+    "TOTALDEPOSITCOUNTDAY": 5,
+    "TOTALWITHDRAWLCOUNTDAY": 5,
+    "TOTALWITHDRAWLAMOUNTDAY": 200000
+}'
+{
+    "transaction_id": "TEST_PRODUCT_MCC",
+    "model_version": "1.0",
+    "fraud_reason": "Total cash withdrawal exceeds 10 transactions or more in a month.",
+    "fraud_decision": "HIGH RISK",
+    "evaluated_at": "2026-04-23T06:10:09.577320Z"
+}%
