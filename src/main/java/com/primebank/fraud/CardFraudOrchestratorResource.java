@@ -74,7 +74,7 @@ public class CardFraudOrchestratorResource {
                 }else if (totalDepositAmountDay >= 200000){
                     fraud_reason = "Total Cash Deposit BDT 2 lac or more in a day";
                 }else if(totalWithdrawlAmountMonth >= 500000){
-                    fraud_reason = "Total cash withdrawal exceeds BDT 50,0000 in a month.";
+                    fraud_reason = "Total cash withdrawal exceeds BDT 5,00,000 in a month.";
                 }else if(totalWithdrawlCountMonth >= 10){
                     fraud_reason = "Total cash withdrawal exceeds 10 transactions or more in a month.";
                 }
