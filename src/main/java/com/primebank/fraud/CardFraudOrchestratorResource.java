@@ -64,8 +64,22 @@ public class CardFraudOrchestratorResource {
             
             if("MIS".equals(txnType)){
                 String fraud_reason = "";
+                String cat = txn.get("CAT") == null ? null : txn.get("CAT").toString();
                 
-                if(totalWithdrawlAmountDay >= 200000){
+                if("Amt6Month2x".equals(cat)){
+                    fraud_reason = "More than 2 times of the previous largest transaction for the client in last 6 months";
+                }
+                else if("CntSingleDay".equals(cat)){
+                    fraud_reason = "Number of transactions exceed 30 in a single day";
+                }
+                else if("Amt7CamDay".equals(cat)){
+                    fraud_reason = "Number of transactions >= 30 in 7 calender day and total amount >= BDT 2,000,000";
+                }
+                else if("Cnt6MonthXpercentage".equals(cat)){
+                    fraud_reason = "Number of transactions in a month is more than 200% of the average number for the"+
+                    " client ion last 6 months with min num of transactions being 20 on a single day";
+                }
+                else if(totalWithdrawlAmountDay >= 200000){
                     fraud_reason = "Total Cash Withdrawal BDT 2 lac or more in a day"; 
                 }else if(totalWithdrawlCountDay >= 5){
                     fraud_reason = "Total Cash Withdrawal 5 times or more in a day";
