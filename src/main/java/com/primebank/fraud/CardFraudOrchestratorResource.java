@@ -6,6 +6,7 @@ import org.kie.kogito.decision.DecisionModels;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.Instant;
@@ -65,39 +66,54 @@ public class CardFraudOrchestratorResource {
             if("MIS".equals(txnType)){
                 String fraud_reason = "";
                 String cat = txn.get("CAT") == null ? null : txn.get("CAT").toString();
-                
+                String risk_type = "";
                 if("Amt6Month2x".equals(cat)){
                     fraud_reason = "More than 2 times of the previous largest transaction for the client in last 6 months";
+                    risk_type = "Unusual Transactions";
                 }else if("CntSingleDay".equals(cat)){
                     fraud_reason = "Number of transactions exceed 30 in a single day";
+                    risk_type = "Unusual Transactions";
                 }else if("Amt7CamDay".equals(cat)){
                     fraud_reason = "Number of transactions >= 30 in 7 calender day and total amount >= BDT 2,000,000";
+                    risk_type = "Unusual Transactions";
                 }
                 else if("Cnt6MonthXpercentage".equals(cat)){
                     fraud_reason = "Number of transactions in a month is more than 200% of the average number for the"+
                     " client ion last 6 months with min num of transactions being 20 on a single day";
+                    risk_type = "Unusual Transactions";
                 }else if ("Bounce5InDay".equals(cat)){
                     fraud_reason = "5 Bounce in a day";
+                    risk_type = "Cheque Bounce";
                 }else if ("SusOrFroz".equals(cat)){
                     fraud_reason = "Txn in Frozen AC";
+                    risk_type = "Transactions occur in Frozen/ Suspended Account";
                 }else if ("TP3TInAMonth".equals(cat)){
                     fraud_reason = "TP breached in a month 3 times";
+                    risk_type = "TP violation";
                 }else if("TP2T3Month".equals(cat)){
                     fraud_reason = "TP breached in 3 months 2 times";
+                    risk_type = "TP violation";
                 }else if("TP-Income".equals(cat)){
                     fraud_reason = "Income TP breach";
+                    risk_type = "TP violation";
                 }else if(totalWithdrawlAmountDay >= 200000){
-                    fraud_reason = "Total Cash Withdrawal BDT 2 lac or more in a day"; 
+                    fraud_reason = "Total Cash Withdrawal BDT 2 lac or more in a day";
+                    risk_type = "High value transactions by high risk customers";
                 }else if(totalWithdrawlCountDay >= 5){
                     fraud_reason = "Total Cash Withdrawal 5 times or more in a day";
+                    risk_type = "High value transactions by high risk customers";
                 }else if (totalDepositCountDay >= 5){
                     fraud_reason = "Total Cash Deposit 5 times or more in a day";
+                    risk_type = "High value transactions by high risk customers";
                 }else if (totalDepositAmountDay >= 200000){
                     fraud_reason = "Total Cash Deposit BDT 2 lac or more in a day";
+                    risk_type = "High value transactions by high risk customers";
                 }else if(totalWithdrawlAmountMonth >= 500000){
                     fraud_reason = "Total cash withdrawal exceeds BDT 5,00,000 in a month.";
+                    risk_type = "High value transactions by high risk customers";
                 }else if(totalWithdrawlCountMonth >= 10){
                     fraud_reason = "Total cash withdrawal exceeds 10 transactions or more in a month.";
+                    risk_type = "High value transactions by high risk customers";
                 }
 
                 Map<String, Object> response = new HashMap<>();
@@ -106,6 +122,7 @@ public class CardFraudOrchestratorResource {
                 response.put("fraud_reason", (Object) fraud_reason);
                 response.put("evaluated_at", Instant.now().toString());
                 response.put("model_version", "1.0");
+                response.put("risk_type", (Object) risk_type);
                 return Response.ok(response).build();
             }else{
                 if(ml_score >= getAsDouble("ML_FRAUD_THRESHOLD")){
