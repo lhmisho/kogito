@@ -68,18 +68,25 @@ public class CardFraudOrchestratorResource {
                 
                 if("Amt6Month2x".equals(cat)){
                     fraud_reason = "More than 2 times of the previous largest transaction for the client in last 6 months";
-                }
-                else if("CntSingleDay".equals(cat)){
+                }else if("CntSingleDay".equals(cat)){
                     fraud_reason = "Number of transactions exceed 30 in a single day";
-                }
-                else if("Amt7CamDay".equals(cat)){
+                }else if("Amt7CamDay".equals(cat)){
                     fraud_reason = "Number of transactions >= 30 in 7 calender day and total amount >= BDT 2,000,000";
                 }
                 else if("Cnt6MonthXpercentage".equals(cat)){
                     fraud_reason = "Number of transactions in a month is more than 200% of the average number for the"+
                     " client ion last 6 months with min num of transactions being 20 on a single day";
-                }
-                else if(totalWithdrawlAmountDay >= 200000){
+                }else if ("Bounce5InDay".equals(cat)){
+                    fraud_reason = "5 Bounce in a day";
+                }else if ("SusOrFroz".equals(cat)){
+                    fraud_reason = "Txn in Frozen AC";
+                }else if ("TP3TInAMonth".equals(cat)){
+                    fraud_reason = "TP breached in a month 3 times";
+                }else if("TP2T3Month".equals(cat)){
+                    fraud_reason = "TP breached in 3 months 2 times";
+                }else if("TP-Income".equals(cat)){
+                    fraud_reason = "Income TP breach";
+                }else if(totalWithdrawlAmountDay >= 200000){
                     fraud_reason = "Total Cash Withdrawal BDT 2 lac or more in a day"; 
                 }else if(totalWithdrawlCountDay >= 5){
                     fraud_reason = "Total Cash Withdrawal 5 times or more in a day";
